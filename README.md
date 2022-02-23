@@ -1,20 +1,53 @@
-# Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+# Vertica Umbraco Headless Framework
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+This is an extension for [Umbraco](https://github.com/umbraco/umbraco-cms) (version 9+) that lets you use your Umbraco content in a headless fashion. It is highly customizable, and you can tweak or replace every aspect of the generated output.
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+Vertica Umbraco Headless Framework (VUHF) is *not* to be confused with the [Umbraco Heartcore](https://umbraco.com/products/umbraco-heartcore/), commercial headless SaaS offering from Umbraco. This is purely a rendering framework, designed to replace (or complement) the rendering mechanism within Umbraco.
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+The framework is build to be:
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+- **Friendly** - plug & play headless CMS capability for Umbraco
+- **Flexible** - 100% extensible and customizable 
+- **Open** - integrates seamlessly with the Umbraco ecosystem, thus imposing no limitations towards other Umbraco packages and add-ons
+
+## Installation
+
+First install the VUHF [NuGet package](https://www.nuget.org/packages/Vertica.Umbraco.Headless.Core/) in your Umbraco project:
+
+```
+dotnet add MyProject package Vertica.Umbraco.Headless.Core
+```
+
+Now open the `Startup` class of your Umbraco project and include the VUHF core extensions by adding: 
+
+```csharp
+using Vertica.Umbraco.Headless.Core.Extensions;
+```
+
+Lastly add `AddHeadless()` to the `IUmbracoBuilder` setup in the `ConfigureServices(...)` method of the same class:
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+  services.AddUmbraco(_env, _config)
+    .AddBackOffice()
+    .AddWebsite()
+    .AddComposers()
+    .AddHeadless() // adds Vertica Umbraco Headless Framework to Umbraco
+    .Build();
+}
+```
+
+Provided your site has any published content, it will now be returned as JSON when requested. 
+
+By default VUHF takes over the entire output rendering, meaning any existing Umbraco templates will no longer be invoked. However, this (and much more) can be changed and tailored to your specific needs. Have a read through the documentation below.
+
+## Documentation - table of contents
+
+- [Exploring the JSON format](docs/exploring-the-json-format.md) - an introduction to the generated JSON output
+- [Customizing the page JSON output](docs/customizing-the-page-json-output.md) - a walkthrough of the most commonly used extension points
+- [Property rendering](docs/property-rendering.md) - property level rendering and extension explained
+- [Fallback handling](docs/fallback-handling.md) - how to use the Umbraco fallback mechanism with VUHF
+- [Building a custom API](building-a-custom-api.md) - get started with custom APIs leveraging headless content output
+- [Headless or hybrid CMS](docs/headless-or-hybrid-cms.md) - serve content both as head and in a headless manner
+- [OpenAPI support](openapi-support.md) - generate OpenAPI contracts for your content models 

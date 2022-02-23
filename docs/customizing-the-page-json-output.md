@@ -1,0 +1,184 @@
+# Customizing the page JSON output
+
+The following covers the most common extension points for the page JSON output. If you haven't already, read [Exploring the JSON format](exploring-the-json-format.md) before diving into this.
+
+## Additional data in `metadata` and/or `navigation` 
+
+To tweak the `metadata` and/or `navigation` output, you have to create your own implementations the interfaces [`IMetadataBuilder`](../src/Vertica.Umbraco.Headless.Core/Rendering/IMetadataBuilder.cs) and/or [`INavigationBuilder`](../src/Vertica.Umbraco.Headless.Core/Rendering/INavigationBuilder.cs) respectively. To keep your implementations simple you can opt to expand upon the core implementations rather than building your own from scratch.
+
+Once you have your implementations in place, you must replace the default implementations. You do that by registering your own implementations as singletons in the `ConfigureServices(...)` method of `Startup`.
+
+In the following sample we'll:
+
+- Add a secondary navigation to `navigation`
+- Add the content last modified date to `metadata`
+
+```csharp
+// our custom navigation model - based on the default Navigation (which implements INavigation)
+public class MyNavigation : Navigation
+{
+  public IEnumerable<NameAndUrl> Secondary { get; set; }
+}
+
+// custom navigation builder that includes a secondary navigation in the default navigation output
+public class MyNavigationBuilder : NavigationBuilder
+{
+  public override INavigation BuildNavigation(IPublishedContent content)
+  {
+    // add the default navigation data to our custom navigation class
+    var myNavigation = base.BuildNavigation<MyNavigation>(content);
+
+    // add our secondary navigation (root level children) - NameAndUrl is a core class, we'll reuse it here
+    myNavigation.Secondary = content.AncestorOrSelf(2).Children.Select(c => new NameAndUrl(c.Name, c.Url())).ToArray();
+
+    return myNavigation;
+  }
+}
+
+// our custom metadata model - based on the default Metadata (which implements IMetadata)
+public class MyMetadata : Metadata
+{
+  public DateTime LastModified { get; set; }
+}
+
+// our custom metadata builder that adds last modified to the default metadata output
+public class MyMetadataBuilder : MetadataBuilder
+{
+  public override IMetadata BuildMetadata(IPublishedContent content)
+  {
+    // add the default metadata to our custom metadata class
+    var myMetadata = base.BuildMetadata<MyMetadata>(content);
+
+    // add last modified date 
+    myMetadata.LastModified = content.UpdateDate;
+
+    return myMetadata;
+  }
+}
+```
+
+And to swap the default implementations with our custom implementations:
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+  services.AddUmbraco(_env, _config)
+    // ...
+    .AddHeadless()
+    .Build();
+
+  // replace the default navigation and metadata builders  
+  services.AddSingleton<INavigationBuilder, MyNavigationBuilder>();
+  services.AddSingleton<IMetadataBuilder, MyMetadataBuilder>();
+}
+```
+
+## Custom content models
+
+When VUHF builds the `content` and `settings` parts of the `contentElement` output, it generates content models dynamically based on the content type of the requested content. This is likely a great fit for most usage, but sometimes you may find yourself wanting to control and enrich the content output for a given content type.
+
+To this end you can create your own content models per content type. In other words, you can construct your own output for certain content types, while still leveraging the dynamic content model generation for the rest of the content types.
+
+Custom content model is created by implementing the factory interface [`IContentModelBuilder`](../src/Vertica.Umbraco.Headless.Core/Rendering/IContentModelBuilder.cs) for all relevant content types. Each factory implementation is then responsible for creating a new instance of the custom content model for the given content type.
+
+The content model can be its own factory, if you prefer - or you can create a factory implementation seperately from the content model, if you want a little more seperation of concerns.
+
+You can use dependency injection with your factory implementations, and you don't need to register them anywhere; VUHF automatically picks up all implementations and registers them correctly.
+
+In the following sample we'll create a custom content model for the content type with alias "home". The factory implementation uses dependency injection to acquire and enrich the custom content model with external service data:
+
+```csharp
+// this is the content model factory
+public class HomeContentModelBuilder : IContentModelBuilder
+{
+  private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+
+  public HomeContentModelBuilder(IUmbracoContextAccessor umbracoContextAccessor)
+  {
+    _umbracoContextAccessor = umbracoContextAccessor;
+  }
+
+  public string ContentTypeAlias() => "home";
+
+  public Type ModelType() => typeof(HomeContentModel);
+
+  public object BuildContentModel(IPublishedElement content, IContentElementBuilder contentElementBuilder)
+    => new HomeContentModel
+    {
+      TheTitle = content.Value<string>("title"),
+      TheIntro = content.Value<string>("intro"),
+      IsPreview = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode
+    };
+}
+
+// this is the custom content model
+public class HomeContentModel
+{
+  public string TheTitle { get; set; }
+
+  public string TheIntro { get; set; }
+
+  public bool IsPreview { get; set; }
+}
+```
+
+*Note: This sample implementation is based solely on `IPublishedContent`. If you're using ModelsBuilder to generate C# classes, you can simplify it and get rid of the magic property name strings.*
+
+### What is that `IContentElementBuilder` parameter?
+
+In short: `IContentElementBuilder` is responsible for stitching everything together when VUHF creates JSON output for Umbraco content. This means that `IContentElementBuilder` is responsible for extracting Umbraco property values when creating dynamically generated content models.
+
+As long as your factory method only has to extract simple Umbraco properties for your custom content model (like the sample above), you probably don't need to worry about `IContentElementBuilder`. 
+
+If you find yourself wanting to use the [built-in property rendering](property-renderering.md) for complex Umbraco properties (i.e. Media or Block List rendering), you can use `IContentElementBuilder` to extract Umbraco property values in your factory implementation - like this: `contentElementBuilder.RenderedValueFor<Media>(content, "image")`. 
+
+## Creating your own `RenderController`
+
+All VUHF outut builds on top of the default Umbraco request pipeline. Thus all requests are handled by implementations of `RenderController`. Upon installation, VUHF adds a default `RenderController` to handle all requests that are not specifically handled by other `RenderController` implementations. 
+
+You may eventually find it handy to create your own `RenderController` to manage request state. In that case you either want to:
+
+- Replace the default `RenderController` to handle requests for all page types, or
+- Create `RenderController` implementations to handle requests for specific page types, or
+- All of the above
+
+A custom VUHF `RenderController` is created as an implementation of [`HeadlessRenderController`](../src/Vertica.Umbraco.Headless.Core/Controllers/HeadlessRenderController.cs). 
+
+When creating `RenderController` implementations for specific page types, and if you're using ModelsBuilder to generate C# classes, you can choose to implement `HeadlessRenderController<T>` instead (where `T` is your page type). This will give you strongly typed access to the page content in your implementation.
+
+```csharp
+using Vertica.Umbraco.Headless.Core.Controllers;
+
+// ...
+
+public class MyDefaultRenderController : HeadlessRenderController { 
+  // ...
+}
+
+public class MyConcretePageRenderController : HeadlessRenderController<MyConcretePage> { 
+  // ...
+}
+```
+
+To replace the default VUHF `RenderController`, change your `Startup` class to use the `AddHeadless<T>(...)` overload that accepts a type argument for the default controller:
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+  services.AddUmbraco(_env, _config)
+    .AddBackOffice()
+    .AddWebsite()
+    .AddComposers()
+    .AddHeadless<MyDefaultRenderController>() // adds Vertica Umbraco Headless Framework to Umbraco
+    .Build();
+}
+```
+
+If you're looking to use VUHF only for select areas of your content (e.g. content type specific `RenderController` implementations), or as part of a [custom API implementation](building-a-custom-api.md), you probably don't want a VUHF `HeadlessRenderController` as the default controller. Fortunately the `AddHeadless<T>(...)` overload accepts any `RenderController` implementation - it doesn't have to be a VUHF controller. You can even use `RenderController` itself in the overload, which will revert the content rendering to the Umbraco default.
+
+## Custom page output
+
+You can customize the entire page output (the container for `alias`, `content`, `metadata` and `navigation`) in the same manner as is shown above for `metadata` and `navigation` - by creating your own implementation of the interface [`IPageDataBuilder`](../src/Vertica.Umbraco.Headless.Core/Rendering/IPageDataBuilder.cs) and swapping the default implementation with your own in `Startup`.
+
+
+This extension point is mostly mentioned here for the sake of completion. If you're considering a customized page output, you should probably first consider if a custom content model is a better fit for your needs. 

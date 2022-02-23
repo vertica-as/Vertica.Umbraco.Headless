@@ -1,0 +1,33 @@
+# Building a custom API
+
+Whlie VUHF is very much aimed at rendering headless content on the actual routes of the published Umbraco content, you can also use the same rendering in your own custom APIs.
+
+VUHF ships with an API controller base class you can use as a starting point: [`HeadlessApiController`](../src/Vertica.Umbraco.Headless.Core/Controllers/HeadlessApiController.cs). An implementation of this base class could look like this:
+
+```csharp
+public class HeadlessContentApiController : HeadlessApiController
+{
+  public HeadlessContentApiController(...) 
+    : base(...)
+  {
+  }
+
+  // get headless content by Umbraco content ID
+  public IActionResult Content(int id) => ContentFor(id);
+}
+```
+
+## Exploring the API a little more in depth
+
+When implementing a custom API based on VUHF, there are two key services in play:
+
+- `IContentElementBuilder` - responsible for turning published Umbraco content into corresponding `IContentElement` instances while adhering to the defined property renderers and the general configuration
+- `IOutputRenderer` - responsible for rendering serialized output from controllers 
+
+You can use dependency injection to obtain both services, along with any other services needed by your API.
+
+The flow of your API methods will likely look like this:
+
+1. Query Umbraco to obtain whatever content your API method should serve as output.
+2. Use `IContentElementBuilder.ContentElementFor(...)` to create `IContentElement` instances for the obtained content.
+3. Use `IOutputRenderer.ActionResultFor(...)` to serialize the API output in a manner consistent with any other VUHF output in your project.
