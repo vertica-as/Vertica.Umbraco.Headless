@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Authors>Kenn Jacobsen</Authors>
+    <Company>Vertica A/S</Company>
+    <Product>Vertica Umbraco Headless Framework</Product>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>Vertica.png</PackageIcon>
+    <Copyright>Vertica A/S</Copyright>
+    <Version>0.2.0</Version>
+    <Description>Swagger support for Vertica.Umbraco.Headless.Core</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\build\Vertica.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.2.3" />
+    <PackageReference Include="Umbraco.Cms.Core" Version="9.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vertica.Umbraco.Headless.Core\Vertica.Umbraco.Headless.Core.csproj" />
+  </ItemGroup>
+
+</Project>
