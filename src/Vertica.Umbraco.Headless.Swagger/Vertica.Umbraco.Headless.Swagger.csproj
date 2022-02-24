@@ -9,8 +9,9 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>Vertica.png</PackageIcon>
     <Copyright>Vertica A/S</Copyright>
-    <Version>0.2.0</Version>
+    <Version>0.2.1</Version>
     <Description>Swagger support for Vertica.Umbraco.Headless.Core</Description>
+    <PackageProjectUrl>https://github.com/vertica-as/vertica.umbraco.headless</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
