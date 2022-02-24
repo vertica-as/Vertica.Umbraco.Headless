@@ -48,6 +48,6 @@ By default VUHF takes over the entire output rendering, meaning any existing Umb
 - [Customizing the page JSON output](docs/customizing-the-page-json-output.md) - a walkthrough of the most commonly used extension points
 - [Property rendering](docs/property-rendering.md) - property level rendering and extension explained
 - [Fallback handling](docs/fallback-handling.md) - how to use the Umbraco fallback mechanism with VUHF
-- [Building a custom API](building-a-custom-api.md) - get started with custom APIs leveraging headless content output
+- [Building a custom API](docs/building-a-custom-api.md) - get started with custom APIs leveraging headless content output
 - [Headless or hybrid CMS](docs/headless-or-hybrid-cms.md) - serve content both as head and in a headless manner
-- [OpenAPI support](openapi-support.md) - generate OpenAPI contracts for your content models 
+- [OpenAPI support](docs/openapi-support.md) - generate OpenAPI contracts for your content models 
