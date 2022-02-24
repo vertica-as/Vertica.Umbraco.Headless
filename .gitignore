@@ -6,7 +6,7 @@
 *.flag
 *.zip
 *.ts
-src/Vertica.Umbraco.Headless.Test/App_Plugins/Vertica*
+build/*local.ps1
 
 
 # User-specific files
