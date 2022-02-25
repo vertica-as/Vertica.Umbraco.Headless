@@ -200,7 +200,7 @@ namespace Vertica.Umbraco.Headless.Swagger.Filters
 
 								// check for explicit nullability
 								var nullabilityInfo = nullabilityInfoContext.Create(p);
-								if (nullabilityInfo.WriteState == NullabilityState.Nullable)
+								if (nullabilityInfo.ReadState == NullabilityState.Nullable)
 								{
 									return true;
 								}
