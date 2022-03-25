@@ -35,7 +35,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
 
         public virtual ContentElementWithSettings ContentElementWithSettingsFor(IPublishedElement content, IPublishedElement settings)
         {
-		This is not code
+		var test = "this is valid";
 	        var contentElementWithSettings = ContentElementFor<ContentElementWithSettings>(content);
 	        contentElementWithSettings.Settings = ContentElementFor<ContentElement>(settings);
 	        return contentElementWithSettings;
