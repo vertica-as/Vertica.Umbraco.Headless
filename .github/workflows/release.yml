@@ -70,3 +70,11 @@ jobs:
         asset_path: ./nupkgs/Vertica.Umbraco.Headless.Swagger.${{ env.releaseversion }}.nupkg
         asset_name: Vertica.Umbraco.Headless.Swagger.${{ env.releaseversion }}.nupkg
         asset_content_type: application/zip        
+    - name: Push to NuGet - Core
+      run: dotnet nuget push ./nupkgs/Vertica.Umbraco.Headless.Core.${{ env.releaseversion }}.nupkg -k $NUGET_AUTH_TOKEN -s https://api.nuget.org/v3/index.json
+      env: 
+        NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}
+    - name: Push to NuGet - Swagger
+      run: dotnet nuget push ./nupkgs/Vertica.Umbraco.Headless.Swagger.${{ env.releaseversion }}.nupkg -k $NUGET_AUTH_TOKEN -s https://api.nuget.org/v3/index.json
+      env: 
+        NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}
