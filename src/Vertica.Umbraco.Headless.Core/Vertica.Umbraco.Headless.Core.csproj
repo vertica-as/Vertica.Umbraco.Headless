@@ -9,7 +9,8 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>Vertica.png</PackageIcon>
     <Copyright>Vertica A/S</Copyright>
-    <Version>1.8.3</Version>
+    <!-- Version is set during release build -->
+    <!-- <Version></Version> -->
     <Description>Framework for creating headless experiences with Umbraco CMS</Description>
     <PackageProjectUrl>https://github.com/vertica-as/vertica.umbraco.headless</PackageProjectUrl>
   </PropertyGroup>
