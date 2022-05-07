@@ -1,9 +1,10 @@
 ﻿using System;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Vertica.Umbraco.Headless.Core.Rendering
 {
-	public interface IContentModelBuilder
+	public interface IContentModelBuilder : IDiscoverable
 	{
 		string ContentTypeAlias();
 
