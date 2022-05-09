@@ -66,7 +66,19 @@ If you prefer a more friendly UI you can add Swagger UI:
 
 ## Type replacement
 
-:information_source: Documentation pending
+This example will replace the build in `IMetadata` class with a different class:
+
+```csharp
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+  // ...
+
+  app.UseUmbraco()
+    .AddHeadlessSwaggerGen(
+    	null,
+    	type => type.Replace<IMetadata>().With<CustomMetadata>())
+}
+```
 
 ## Custom property editors and OpenAPI schemas
 
