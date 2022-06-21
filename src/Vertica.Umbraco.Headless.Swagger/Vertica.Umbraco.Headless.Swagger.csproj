@@ -9,7 +9,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>Vertica.png</PackageIcon>
     <Copyright>Vertica A/S</Copyright>
-    <Version>0.3.2</Version>
+    <Version>0.2.2</Version>
     <Description>Swagger support for Vertica.Umbraco.Headless.Core</Description>
     <PackageProjectUrl>https://github.com/vertica-as/vertica.umbraco.headless</PackageProjectUrl>
   </PropertyGroup>
@@ -23,7 +23,7 @@
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.2.3" />
-    <PackageReference Include="Umbraco.Cms.Core" Version="[9.0.1,11.0.0)" />
+    <PackageReference Include="Umbraco.Cms.Core" Version="[9.4.1,11.0.0)" />
   </ItemGroup>
 
   <ItemGroup>
