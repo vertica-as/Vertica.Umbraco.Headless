@@ -10,7 +10,8 @@
         <PackageIcon>Vertica.png</PackageIcon>
         <Copyright>Vertica A/S</Copyright>
         <Nullable>enable</Nullable>
-        <Version>0.1.0</Version>
+        <!-- Version is set during release build -->
+        <!-- <Version></Version> -->
         <Description>Umbraco Forms support for Vertica.Umbraco.Headless.Core</Description>
         <PackageProjectUrl>https://github.com/vertica-as/vertica.umbraco.headless</PackageProjectUrl>
     </PropertyGroup>
