@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vertica.Umbraco.Headless.Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vertica.Umbraco.Headless.Swagger", "src\Vertica.Umbraco.Headless.Swagger\Vertica.Umbraco.Headless.Swagger.csproj", "{EF3802F4-9B27-4CE4-8DF9-B2174E52580B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vertica.Umbraco.Headless.Forms", "src\Vertica.Umbraco.Headless.Forms\Vertica.Umbraco.Headless.Forms.csproj", "{AE49173B-980D-48B7-94CD-5F6BBE1F10F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{EF3802F4-9B27-4CE4-8DF9-B2174E52580B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF3802F4-9B27-4CE4-8DF9-B2174E52580B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF3802F4-9B27-4CE4-8DF9-B2174E52580B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE49173B-980D-48B7-94CD-5F6BBE1F10F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE49173B-980D-48B7-94CD-5F6BBE1F10F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE49173B-980D-48B7-94CD-5F6BBE1F10F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE49173B-980D-48B7-94CD-5F6BBE1F10F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
