@@ -31,6 +31,7 @@ jobs:
         dotnet-version: | 
           5.0.x
           6.0.x
+          7.0.x
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
@@ -70,6 +71,17 @@ jobs:
         asset_path: ./nupkgs/Vertica.Umbraco.Headless.Swagger.${{ env.releaseversion }}.nupkg
         asset_name: Vertica.Umbraco.Headless.Swagger.${{ env.releaseversion }}.nupkg
         asset_content_type: application/zip        
+    # Add the block grid package as an asset
+    - name: Upload Release Asset Block Grid
+      id: upload-release-asset-block-grid
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./nupkgs/Vertica.Umbraco.Headless.BlockGrid.${{ env.releaseversion }}.nupkg
+        asset_name: Vertica.Umbraco.Headless.BlockGrid.${{ env.releaseversion }}.nupkg
+        asset_content_type: application/zip
     - name: Push to NuGet - Core
       run: dotnet nuget push ./nupkgs/Vertica.Umbraco.Headless.Core.${{ env.releaseversion }}.nupkg -k $NUGET_AUTH_TOKEN -s https://api.nuget.org/v3/index.json
       env: 
@@ -77,4 +89,8 @@ jobs:
     - name: Push to NuGet - Swagger
       run: dotnet nuget push ./nupkgs/Vertica.Umbraco.Headless.Swagger.${{ env.releaseversion }}.nupkg -k $NUGET_AUTH_TOKEN -s https://api.nuget.org/v3/index.json
       env: 
+        NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}
+    - name: Push to NuGet - Block Grid
+      run: dotnet nuget push ./nupkgs/Vertica.Umbraco.Headless.BlockGrid.${{ env.releaseversion }}.nupkg -k $NUGET_AUTH_TOKEN -s https://api.nuget.org/v3/index.json
+      env:
         NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}

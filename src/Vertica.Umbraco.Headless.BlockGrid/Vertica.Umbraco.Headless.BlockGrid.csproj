@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\build\Vertica.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Umbraco.Cms.Core" Version="[10.3.0,12.0.0)" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Vertica.Umbraco.Headless.Core\Vertica.Umbraco.Headless.Core.csproj" />
+  </ItemGroup>
+</Project>
