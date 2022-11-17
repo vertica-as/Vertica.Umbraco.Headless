@@ -1,16 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Authors>Kenn Jacobsen</Authors>
     <Company>Vertica A/S</Company>
-    <Product>Vertica Umbraco Headless Framework - Swagger</Product>
+    <Product>Vertica Umbraco Headless Framework - Block Grid</Product>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>Vertica.png</PackageIcon>
     <Copyright>Vertica A/S</Copyright>
     <!-- Version is set during release build -->
     <!-- <Version></Version> -->
-    <Description>Swagger support for Vertica.Umbraco.Headless.Core</Description>
+    <Description>Block grid suuport for Vertica.Umbraco.Headless.Core</Description>
     <PackageProjectUrl>https://github.com/vertica-as/vertica.umbraco.headless</PackageProjectUrl>
   </PropertyGroup>
   <ItemGroup>
@@ -20,8 +21,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.2.3" />
-    <PackageReference Include="Umbraco.Cms.Core" Version="[9.0.1,12.0.0)" />
+    <PackageReference Include="Umbraco.Cms.Core" Version="[10.3.0,12.0.0)" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Vertica.Umbraco.Headless.Core\Vertica.Umbraco.Headless.Core.csproj" />

@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFrameworks>net5.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>net5.0;net6.0;net7.0</TargetFrameworks>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Authors>Kenn Jacobsen</Authors>
     <Company>Vertica A/S</Company>
@@ -14,18 +13,15 @@
     <Description>Framework for creating headless experiences with Umbraco CMS</Description>
     <PackageProjectUrl>https://github.com/vertica-as/vertica.umbraco.headless</PackageProjectUrl>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Umbraco.Cms.Core" Version="[9.0.1,11.0.0)" />
-    <PackageReference Include="Umbraco.Cms.Web.Common" Version="[9.0.1,11.0.0)" />
-    <PackageReference Include="Umbraco.Cms.Web.Website" Version="[9.0.1,11.0.0)" />
+    <PackageReference Include="Umbraco.Cms.Core" Version="[9.0.1,12.0.0)" />
+    <PackageReference Include="Umbraco.Cms.Web.Common" Version="[9.0.1,12.0.0)" />
+    <PackageReference Include="Umbraco.Cms.Web.Website" Version="[9.0.1,12.0.0)" />
   </ItemGroup>
-
   <ItemGroup>
     <None Include="..\..\build\Vertica.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
   </ItemGroup>
-
 </Project>
