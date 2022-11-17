@@ -27,8 +27,6 @@ public class BlockGridPropertyRenderer : IPropertyRenderer
         contentElementWithSettings.Settings = builder.ContentElementFor<ContentElement>(item.Settings);
         contentElementWithSettings.RowSpan = item.RowSpan;
         contentElementWithSettings.ColumnSpan = item.ColumnSpan;
-        contentElementWithSettings.ForceLeft = item.ForceLeft;
-        contentElementWithSettings.ForceRight = item.ForceRight;
         contentElementWithSettings.AreaGridColumns = item.AreaGridColumns;
         contentElementWithSettings.Areas = item.Areas?.Any() == true
             ? item.Areas?.Select(area => BlockGridAreaElementFor(builder, area))

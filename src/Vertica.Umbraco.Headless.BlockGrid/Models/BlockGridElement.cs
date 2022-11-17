@@ -6,8 +6,6 @@ namespace Vertica.Umbraco.Headless.BlockGrid.Models
     {
         public int RowSpan { get; set; }
         public int ColumnSpan { get; set; }
-        public bool ForceLeft { get; set; }
-        public bool ForceRight { get; set; }
         public int? AreaGridColumns { get; set; }
         public IEnumerable<BlockGridAreaElement>? Areas { get; set; }
     }
