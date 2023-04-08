@@ -2,7 +2,7 @@
 
 :warning: This add-on is still work in progress :warning:
 
-With an add-on, VUHF can generate OpenAPI schemas for the content models in its JSON output - whether the content models are dynamically created at runtime or defined in your code ([read more here](customizing-the-page-json-output.md)). These schemas can be used to generate models/contracts for your clients (e.g. TypeScript models) using a tool like [NSwag](https://github.com/RicoSuter/NSwag).
+With an add-on, I-ology HeadlessUmbraco can generate OpenAPI schemas for the content models in its JSON output - whether the content models are dynamically created at runtime or defined in your code ([read more here](customizing-the-page-json-output.md)). These schemas can be used to generate models/contracts for your clients (e.g. TypeScript models) using a tool like [NSwag](https://github.com/RicoSuter/NSwag).
 
 As an added bonus you can leverage the same mechanism to generate OpenAPI schemas for any of your own C# classes you'd like to include in the output.
 
@@ -12,11 +12,10 @@ The add-on is built for Swagger using [Swashbuckle](https://github.com/domaindri
 
 ## Installation
 
-First you need to include the VUHF Swagger [NuGet package](https://www.nuget.org/packages/Vertica.Umbraco.Headless.Swagger/) in your project.
+**This package is not available on NuGet.**
 
-```
-dotnet add MyProject package Vertica.Umbraco.Headless.Swagger
-```
+To use this package, you must do the follow
+  - Add reference to package within your C# project
 
 Then append `AddHeadlessSwaggerGen()` to `ConfigureServices(...)` in your `Startup` class - right after `AddHeadless()`:
 
@@ -25,8 +24,8 @@ public void ConfigureServices(IServiceCollection services)
 {
   services.AddUmbraco(_env, _config)
     // ...
-    .AddHeadless() // adds Vertica Umbraco Headless Framework to Umbraco
-    .AddHeadlessSwaggerGen() // adds OpenAPI support for Vertica Umbraco Headless Framework
+    .AddHeadless() // Adds I-ology HeadlessUmbraco to Umbraco
+    .AddHeadlessSwaggerGen() // Adds OpenAPI support for I-ology HeadlessUmbraco
     .Build();
 }
 ```
@@ -42,7 +41,7 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     .WithMiddleware(u =>
 	// ...
 
-  app.UseSwagger(); // add Swagger support to the app
+  app.UseSwagger(); // Add Swagger support to the app
 }
 ```
 
@@ -82,6 +81,6 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 
 ## Custom property editors and OpenAPI schemas
 
-When the OpenAPI schemas are created, VUHF uses the available property renderers to determine the correct types of the content model properties. Any unknown property editor types will resolve to `object` types in the schemas.
+When the OpenAPI schemas are created, I-ology HeadlessUmbraco uses the available property renderers to determine the correct types of the content model properties. Any unknown property editor types will resolve to `object` types in the schemas.
 
-If this doesn't work for you, you can work your way around it by creating [custom property renderers](property-renderering.md) for the property editors that VUHF doesn't recognize or translate correctly into the OpenAPI schemas.
+If this doesn't work for you, you can work your way around it by creating [custom property renderers](property-renderering.md) for the property editors that I-ology HeadlessUmbraco doesn't recognize or translate correctly into the OpenAPI schemas.

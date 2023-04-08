@@ -1,6 +1,6 @@
 # Fallback handling
 
-You can use Umbraco fallback with VUHF in two ways:
+You can use Umbraco fallback with I-ology HeadlessUmbraco in two ways:
 
 - A default fallback applied to all content rendering
 - A customized fallback per property per content type
@@ -18,27 +18,27 @@ public void ConfigureServices(IServiceCollection services)
     .AddBackOffice()
     .AddWebsite()
     .AddComposers()
-    .AddHeadless(defaultFallback: Fallback.ToLanguage) // adds Vertica Umbraco Headless Framework to Umbraco 
+    .AddHeadless(defaultFallback: Fallback.ToLanguage) // Adds I-ology HeadlessUmbraco to Umbraco 
     .Build();
 }
 ```
 
 ## Customized fallback
 
-You can create a very granular fallback setup (per property per content type) by replacing the default VUHF [`IFallbackProvider`](../src/Vertica.Umbraco.Headless.Core/Rendering/Providers/IFallbackProvider.cs) with your own implementation.
+You can create a very granular fallback setup (per property per content type) by replacing the default I-ology HeadlessUmbraco [`IFallbackProvider`](../src/Iology.HeadlessUmbraco.Core/Rendering/Providers/IFallbackProvider.cs) with your own implementation.
 
 A sample implementation could look like this:
 
 ```csharp
 public Fallback FallbackFor(IPublishedElement content, IPublishedProperty property)
 {
-  // create your own fallback implementation specifici content type properties here
+  // Create your own fallback implementation specifici content type properties here
   if (content.ContentType.Alias == "home")
   {
     return Fallback.To(Fallback.None);
   }
 
-  // default fallback
+  // Default fallback
   return Fallback.ToLanguage;
 }
 ```
@@ -53,6 +53,6 @@ public void ConfigureServices(IServiceCollection services)
     .AddHeadless()
     .Build();
   
-  services.AddSingleton<IFallbackProvider, MyFallbackProvider>(); // replace the default fallback provider
+  services.AddSingleton<IFallbackProvider, MyFallbackProvider>(); // Replace the default fallback provider
 }
 ```

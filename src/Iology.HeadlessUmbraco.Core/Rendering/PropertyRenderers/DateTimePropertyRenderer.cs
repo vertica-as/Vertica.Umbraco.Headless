@@ -1,0 +1,22 @@
+﻿/**
+ * Copyright (c) 2022 Vertica
+ * Copyright (c) 2023 I-ology
+ */
+
+using System;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.PublishedContent;
+
+namespace Iology.HeadlessUmbraco.Core.Rendering.PropertyRenderers;
+
+public class DateTimePropertyRenderer : IPropertyRenderer
+{
+	public string PropertyEditorAlias => Constants.PropertyEditors.Aliases.DateTime;
+
+	public Type TypeFor(IPublishedPropertyType propertyType) => typeof(DateTime?);
+
+	public object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder)
+		=> umbracoValue is DateTime dateTime && dateTime.Year > 1
+			? dateTime
+			: (DateTime?) null;
+}
