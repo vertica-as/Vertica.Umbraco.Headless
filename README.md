@@ -1,4 +1,4 @@
-# Vertica Umbraco Headless Framework
+# Vertica Umbraco Headless Framework 
 
 This is an extension for [Umbraco](https://github.com/umbraco/umbraco-cms) (version 9+) that lets you use your Umbraco content in a headless fashion. It is highly customizable, and you can tweak or replace every aspect of the generated output.
 
