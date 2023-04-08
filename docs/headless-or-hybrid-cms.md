@@ -8,13 +8,13 @@ A hybrid CMS is characterized by using traditional CMS templating and rendering 
 
 There are several pros and cons for hybrid CMS, and they won't be debated here. However - one major advantage with regard to Umbraco does deserve an explicit mention: Preview from the backoffice works out of the box.
 
-VUHF is a great fit for turning Umbraco into a hybrid CMS. And because VUHF builds upon the default Umbraco routing mechanism, a hybrid CMS setup also happens to be a great foundation for building a single page application.
+I-ology HeadlessUmbraco is a great fit for turning Umbraco into a hybrid CMS. And because I-ology HeadlessUmbraco builds upon the default Umbraco routing mechanism, a hybrid CMS setup also happens to be a great foundation for building a single page application.
 
 Let's explore that in depth. But first - if you haven't already, go ahead and read [Customizing the page JSON output](customizing-the-page-json-output.md) before continuing.
 
 ## A hybrid `RenderController`
 
-First of all we need replace the default `RenderController` with our own implementation. This new controller will output content either as rendered HTML (using Umbraco's Razor templating) or as JSON (using VUHF) depending on the state of the request. 
+First of all we need replace the default `RenderController` with our own implementation. This new controller will output content either as rendered HTML (using Umbraco's Razor templating) or as JSON (using I-ology HeadlessUmbraco) depending on the state of the request. 
 
 In this implementation we'll return content in a headless manner if the current request has `application/json` in the `Content-Type` header - otherwise we'll apply the current Umbraco (Razor) template.
 
@@ -28,9 +28,9 @@ public class HeadlessHybridRenderController : HeadlessRenderController
     var isHeadlessRequest = "application/json".Equals(Request.ContentType, StringComparison.OrdinalIgnoreCase);
 
     return isHeadlessRequest
-      // let VUHF handle the request	
+      // Let I-ology HeadlessUmbraco handle the request	
       ? base.IndexFor(pageData, content)
-      // let Umbracos rendering handle the request	
+      // Let Umbracos rendering handle the request	
       : CurrentTemplate(content);
   }
 }
@@ -99,6 +99,6 @@ In this sample template we'll render a navigation in Razor, and leave the rest o
 
 ## To summarize...
 
-This is **only** a sample template to demonstrate how VUHF can function in a hybrid setup. In a real life scenario you would likely use a JS framework like Vue or React to build your single page application, and render components based on the `alias` of the routed content data. Depending on your scenario you might also want to seed the first page load (the head request) with its content (e.g. by passing the `IPageData` instance from the `RenderController` directly to the template) instead of loading the first page content asynchronously.
+This is **only** a sample template to demonstrate how I-ology HeadlessUmbraco can function in a hybrid setup. In a real life scenario you would likely use a JS framework like Vue or React to build your single page application, and render components based on the `alias` of the routed content data. Depending on your scenario you might also want to seed the first page load (the head request) with its content (e.g. by passing the `IPageData` instance from the `RenderController` directly to the template) instead of loading the first page content asynchronously.
 
 However... while it's very basic, this sample setup does demonstrate a powerful point: The exact same request route produces different outputs solely based on the request state. As long as we reflect the currently (asynchronously) loaded page in the URL (by means of `history.pushState(...)` in this sample), a full page reload (head request) will produce exactly the same output to the end user. It will be transparent to both our implementation and to the end user whether the currently rendered page was a result of a full page reload or a headless content load. And thus we don't have to worry about shared links, deep linking from search engines and so on.
