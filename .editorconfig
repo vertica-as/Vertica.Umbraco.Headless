@@ -7,8 +7,10 @@ indent_style = space
 trim_trailing_whitespace = true
 charset = utf-8
 
-[*.{json,xml,csproj}]
+[*.{json,xml,csproj,yml}]
 indent_size = 2
 
+# C# Configuration
 [*.cs]
 indent_size = 4
+csharp_style_namespace_declarations = file_scoped:warning
