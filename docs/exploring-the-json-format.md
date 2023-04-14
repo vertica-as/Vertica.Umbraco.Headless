@@ -6,11 +6,11 @@ The default JSON format returned for any given Umbraco page consists of three pa
 - Metadata for the page
 - Navigation related to the page
 
-*Note: All of this is extendable and customizable. You can read more about extending the output and swapping out individual parts [here](customizing-the-page-json-output.md).*
+_Note: All of this is extendable and customizable. You can read more about extending the output and swapping out individual parts [here](customizing-the-page-json-output.md)._
 
 The output looks like this:
 
-```json
+```javascript
 {
   "alias": "...",
   "content": {...},
@@ -23,13 +23,13 @@ Let's explore the individual parts a little more in depth.
 
 ## `alias`
 
-This is the Umbraco content type alias of the requested content. 
+This is the Umbraco content type alias of the requested content.
 
 ## `content`
 
 The content object contains all of the page content - property by property:
 
-```json
+```javascript
 {
   "alias": "...",
   "content": {
@@ -54,7 +54,7 @@ The `metadata` object holds information about the page itself:
 - The `id` of the page
 - All `languages` this page is published in including canonical URLs (for multilingual sites)
 
-```json
+```javascript
 {
   "content": {...},
   "metadata": {
@@ -69,7 +69,7 @@ The `metadata` object holds information about the page itself:
       {
         "language": "da-DK",
         "url": "https://localhost:44311/artikler/en-artikel-om-noget/"
-      }      
+      }
     ]
   },
   "navigation": {...}
@@ -81,9 +81,9 @@ The `metadata` object holds information about the page itself:
 The `navigation` object contains the breadcrumb items for the page. Each breadcrumb item contains:
 
 - The Umbraco `name` of page
-- The relative page `url` 
+- The relative page `url`
 
-```json
+```javascript
 {
   "content": {...},
   "metadata": {...},
