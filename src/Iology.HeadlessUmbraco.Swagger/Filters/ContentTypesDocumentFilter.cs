@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Copyright (c) 2022 Vertica
  * Copyright (c) 2023 I-ology
  */
@@ -339,9 +339,9 @@ public class ContentTypesDocumentFilter : IDocumentFilter
 		return schema;
 	}
 
-	private static string TypeNameFor(string typeName) => typeName.ToFirstUpperInvariant();
+    private static string TypeNameFor(string typeName) => $"umbType_{typeName.ToFirstUpperInvariant()}";
 
-	private static string PropertyNameFor(string propertyName) => propertyName.ToFirstLowerInvariant();
+	private static string PropertyNameFor(string propertyName) => $"umbProp_{propertyName.ToFirstLowerInvariant()}";
 
 	private static Type EnumerableTypeFor(Type type)
 	{
