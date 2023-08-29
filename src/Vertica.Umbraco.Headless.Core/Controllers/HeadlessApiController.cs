@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Web.Common;
@@ -25,18 +26,18 @@ namespace Vertica.Umbraco.Headless.Core.Controllers
 		
 		protected UmbracoHelper UmbracoHelper { get; }
 
-		protected IActionResult ContentFor(int id)
-			=> ContentResultFor(UmbracoHelper.Content(id));
+		protected async Task<IActionResult> ContentFor(int id)
+			=> await ContentResultFor(UmbracoHelper.Content(id));
 
-		protected IActionResult ContentFor(Guid id)
-			=> ContentResultFor(UmbracoHelper.Content(id));
+		protected async Task<IActionResult> ContentFor(Guid id)
+			=> await ContentResultFor(UmbracoHelper.Content(id));
 
-		protected IActionResult ContentResultFor(IPublishedContent content) 
+		protected async Task<IActionResult> ContentResultFor(IPublishedContent content) 
 			=> content != null
-				? OutputRenderer.ActionResult(ContentElementFor(content))
+				? OutputRenderer.ActionResult(await ContentElementFor(content))
 				: NotFound();
 
-		protected IContentElement ContentElementFor(IPublishedContent content) 
-			=> ContentElementBuilder.ContentElementFor(content);
+		protected async Task<IContentElement> ContentElementFor(IPublishedContent content) 
+			=> await ContentElementBuilder.ContentElementFor(content);
 	}
 }

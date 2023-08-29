@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Vertica.Umbraco.Headless.Core.Rendering
@@ -9,8 +10,8 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
 
 		public abstract string ContentTypeAlias();
 
-		public object BuildContentModel(IPublishedElement content, IContentElementBuilder contentElementBuilder) => BuildModel(content, contentElementBuilder);
+		public async Task<object> BuildContentModel(IPublishedElement content, IContentElementBuilder contentElementBuilder) => await BuildModel(content, contentElementBuilder);
 
-		protected abstract T BuildModel(IPublishedElement content, IContentElementBuilder contentElementBuilder);
+        protected abstract Task<T> BuildModel(IPublishedElement content, IContentElementBuilder contentElementBuilder);
 	}
 }

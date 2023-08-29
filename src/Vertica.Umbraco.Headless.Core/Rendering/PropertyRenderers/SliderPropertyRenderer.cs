@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -16,7 +17,8 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 				? typeof(DecimalRange) 
 				: typeof(decimal);
 
-		public object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder)
+		public async Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+            IContentElementBuilder contentElementBuilder)
 		{
 			return umbracoValue switch
 			{

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -26,7 +27,8 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 		        ? typeof(Link)
 		        : typeof(Link[]);
 
-        public virtual object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder)
+        public virtual async Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+            IContentElementBuilder contentElementBuilder)
         {
 	        Link ToLink(UmbracoLink link) => new Link(link.Name, link.Target, _urlProvider.UrlFor(link), link.Type);
 
