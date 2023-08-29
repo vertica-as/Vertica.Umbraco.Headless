@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -15,7 +16,8 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 				? typeof(string[])
 				: typeof(string);
 
-		public object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder)
+		public async Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+            IContentElementBuilder contentElementBuilder)
 		{
 			return umbracoValue switch
 			{

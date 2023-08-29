@@ -1,14 +1,16 @@
-﻿using Umbraco.Cms.Core.Models.PublishedContent;
+﻿using System.Threading.Tasks;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Vertica.Umbraco.Headless.Core.Models;
 
 namespace Vertica.Umbraco.Headless.Core.Rendering
 {
     public interface IContentElementBuilder
     {
-	    T ContentElementFor<T>(IPublishedElement content) where T : class, IContentElement, new();
+	    Task<T> ContentElementFor<T>(IPublishedElement content) where T : class, IContentElement, new();
 
-	    ContentElementWithSettings ContentElementWithSettingsFor(IPublishedElement content, IPublishedElement settings);
+	    Task<ContentElementWithSettings> ContentElementWithSettingsFor(IPublishedElement content,
+            IPublishedElement settings);
 
-        object PropertyValueFor(IPublishedElement content, IPublishedProperty property);
+        Task<object> PropertyValueFor(IPublishedElement content, IPublishedProperty property);
     }
 }

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Extensions;
+using Vertica.Umbraco.Headless.Core.Extensions;
 using Vertica.Umbraco.Headless.Core.Models;
 using Vertica.Umbraco.Headless.Core.Rendering.Providers;
 
@@ -27,18 +29,19 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 				? typeof(Media[])
 				: typeof(Media);
 
-		public virtual object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder)
+		public virtual async Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+            IContentElementBuilder contentElementBuilder)
 		{
-			Media CreateMedia(IPublishedContent media)
+			async Task<Media> CreateMedia(IPublishedContent media)
 			{
 				var imageCropperValue = media.Value<ImageCropperValue>(Constants.Conventions.Media.File);
-				return MediaPicker3PropertyRenderer.ToMedia(media, imageCropperValue, contentElementBuilder, _urlProvider, UrlMode.Auto);
+				return await MediaPicker3PropertyRenderer.ToMedia(media, imageCropperValue, contentElementBuilder, _urlProvider, UrlMode.Auto);
 			}
 
 			return umbracoValue switch
 			{
-				IPublishedContent item => CreateMedia(item),
-				IEnumerable<IPublishedContent> items => items.Select(CreateMedia).ToArray(),
+				IPublishedContent item => await CreateMedia(item),
+				IEnumerable<IPublishedContent> items => await items.ToArrayAsync(CreateMedia),
 				_ => null
 			};
 		}

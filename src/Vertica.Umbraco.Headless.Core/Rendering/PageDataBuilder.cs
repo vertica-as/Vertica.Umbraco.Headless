@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Models.PublishedContent;
+﻿using System.Threading.Tasks;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Vertica.Umbraco.Headless.Core.Models;
 
 namespace Vertica.Umbraco.Headless.Core.Rendering
@@ -12,9 +13,9 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
 			NavigationBuilder = navigationBuilder;
 		}
 
-		public virtual IPageData BuildPageData(IPublishedContent content)
+		public virtual async Task<IPageData> BuildPageData(IPublishedContent content)
 		{
-			var pageData = ContentElementBuilder.ContentElementFor<PageData>(content);
+			var pageData = await ContentElementBuilder.ContentElementFor<PageData>(content);
 			pageData.Metadata = MetadataFor(content);
 			pageData.Navigation = NavigationFor(content);
 			return pageData;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
@@ -10,6 +11,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
 
         Type TypeFor(IPublishedPropertyType propertyType);
 
-        object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder);
+        Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+            IContentElementBuilder contentElementBuilder);
     }
 }

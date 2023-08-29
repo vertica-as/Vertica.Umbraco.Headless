@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Extensions.Logging;
@@ -48,21 +50,27 @@ namespace Vertica.Umbraco.Headless.Core.Controllers
 		
 		protected IPageDataBuilder PageDataBuilder { get; }
 
-		public override IActionResult Index()
+        [NonAction]
+        public override IActionResult Index()
+        {
+            throw new NotSupportedException("Sync rendering is not supported");
+        }
+
+		public async Task<IActionResult> Index(CancellationToken cancellationToken)
 		{
 			if (!(CurrentPage is T content))
 			{
 				throw new ArgumentException("Wrong type of content", nameof(CurrentPage));
 			}
 
-			var pageData = PageDataFor(content);
+			var pageData = await PageDataFor(content);
 			return IndexFor(pageData, content);
 		}
 
 		protected virtual IActionResult IndexFor(IPageData pageData, T content)
 			=> OutputRenderer.ActionResult(pageData);
 
-		protected virtual IPageData PageDataFor(T content) 
-			=> PageDataBuilder.BuildPageData(content);
+		protected virtual async Task<IPageData> PageDataFor(T content) 
+			=> await PageDataBuilder.BuildPageData(content);
 	}
 }

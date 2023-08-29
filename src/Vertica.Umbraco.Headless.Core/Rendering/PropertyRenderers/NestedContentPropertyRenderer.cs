@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -21,16 +22,17 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 		        : typeof(IContentElement[]);
         }
 
-        public virtual object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder)
+        public virtual async Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+            IContentElementBuilder contentElementBuilder)
         {
             if (umbracoValue is IEnumerable<IPublishedElement> items)
             {
-                return items.Select(contentElementBuilder.ContentElementFor).ToArray();
+                return await items.ToArrayAsync(async i => await contentElementBuilder.ContentElementFor(i));
             }
 
             if (umbracoValue is IPublishedElement item)
             {
-                return contentElementBuilder.ContentElementFor(item);
+                return await contentElementBuilder.ContentElementFor(item);
             }
 
             return null;
