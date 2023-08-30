@@ -76,17 +76,17 @@ public class MyTextBoxPropertyRenderer : IPropertyRenderer
   public Type TypeFor(IPublishedPropertyType propertyType) => typeof(string);
 
   // extract the property value
-  public object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder)
+  public Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
   {
-  	// expecting a string value for Textbox properties
-  	if (!(umbracoValue is string value))
-  	{
-      return null;
-  	}
+    // expecting a string value for Textbox properties
+    if (!(umbracoValue is string value))
+    {
+      return Task.FromResult<object>(null);
+    }
 
-  	// append " (preview mode)" to the property value if the current context is a preview
-  	var isPreview = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode;
-  	return $"{value} {(isPreview ? " (preview mode)" : "")}";
+    // append " (preview mode)" to the property value if the current context is a preview
+    var isPreview = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode;
+    return Task.FromResult<object>($"{value} {(isPreview ? " (preview mode)" : "")}");
   }
 }
 ```

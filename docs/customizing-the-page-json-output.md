@@ -23,15 +23,15 @@ public class MyNavigation : Navigation
 // custom navigation builder that includes a secondary navigation in the default navigation output
 public class MyNavigationBuilder : NavigationBuilder
 {
-  public override INavigation BuildNavigation(IPublishedContent content)
+  public override Task<INavigation> BuildNavigationAsync(IPublishedContent content, CancellationToken cancellationToken)
   {
     // add the default navigation data to our custom navigation class
     var myNavigation = base.BuildNavigation<MyNavigation>(content);
-
+  
     // add our secondary navigation (root level children) - NameAndUrl is a core class, we'll reuse it here
     myNavigation.Secondary = content.AncestorOrSelf(2).Children.Select(c => new NameAndUrl(c.Name, c.Url())).ToArray();
-
-    return myNavigation;
+  
+    return Task.FromResult<INavigation>(myNavigation);
   }
 }
 
@@ -44,15 +44,15 @@ public class MyMetadata : Metadata
 // our custom metadata builder that adds last modified to the default metadata output
 public class MyMetadataBuilder : MetadataBuilder
 {
-  public override IMetadata BuildMetadata(IPublishedContent content)
+  public override Task<IMetadata> BuildMetadataAsync(IPublishedContent content, CancellationToken cancellationToken)
   {
     // add the default metadata to our custom metadata class
     var myMetadata = base.BuildMetadata<MyMetadata>(content);
-
+  
     // add last modified date 
     myMetadata.LastModified = content.UpdateDate;
-
-    return myMetadata;
+  
+    return Task.FromResult<IMetadata>(myMetadata);
   }
 }
 ```
@@ -102,13 +102,13 @@ public class HomeContentModelBuilder : IContentModelBuilder
 
   public Type ModelType() => typeof(HomeContentModel);
 
-  public object BuildContentModel(IPublishedElement content, IContentElementBuilder contentElementBuilder)
-    => new HomeContentModel
+  public Task<object> BuildContentModelAsync(IPublishedElement content, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
+    => Task.FromResult<object>(new HomeContentModel
     {
-      TheTitle = content.Value<string>("title"),
-      TheIntro = content.Value<string>("intro"),
-      IsPreview = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode
-    };
+        TheTitle = content.Value<string>("title"),
+        TheIntro = content.Value<string>("intro"),
+        IsPreview = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode
+    });
 }
 
 // this is the custom content model
@@ -130,7 +130,7 @@ In short: `IContentElementBuilder` is responsible for stitching everything toget
 
 As long as your factory method only has to extract simple Umbraco properties for your custom content model (like the sample above), you probably don't need to worry about `IContentElementBuilder`. 
 
-If you find yourself wanting to use the [built-in property rendering](property-renderering.md) for complex Umbraco properties (i.e. Media or Block List rendering), you can use `IContentElementBuilder` to extract Umbraco property values in your factory implementation - like this: `contentElementBuilder.RenderedValueFor<Media>(content, "image")`. 
+If you find yourself wanting to use the [built-in property rendering](property-renderering.md) for complex Umbraco properties (i.e. Media or Block List rendering), you can use `IContentElementBuilder` to extract Umbraco property values in your factory implementation - like this: `await contentElementBuilder.RenderedValueForAsync<Media>(content, "image", cancellationToken)`. 
 
 ## Creating your own `RenderController`
 
