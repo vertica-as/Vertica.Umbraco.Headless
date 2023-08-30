@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 using Vertica.Umbraco.Headless.Core.Models;
@@ -7,7 +8,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
 {
 	public class NavigationBuilder : INavigationBuilder
 	{
-		public virtual INavigation BuildNavigation(IPublishedContent content) => BuildNavigation<Navigation>(content);
+		public virtual Task<INavigation> BuildNavigationAsync(IPublishedContent content) => Task.FromResult<INavigation>(BuildNavigation<Navigation>(content));
 
 		protected TNavigation BuildNavigation<TNavigation>(IPublishedContent content) where TNavigation : class, INavigation, new()
 			=> new TNavigation

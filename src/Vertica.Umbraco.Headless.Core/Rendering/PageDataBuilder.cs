@@ -16,8 +16,8 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
 		public virtual async Task<IPageData> BuildPageDataAsync(IPublishedContent content)
 		{
 			var pageData = await ContentElementBuilder.ContentElementForAsync<PageData>(content).ConfigureAwait(false);
-			pageData.Metadata = MetadataFor(content);
-			pageData.Navigation = NavigationFor(content);
+			pageData.Metadata = await MetadataForAsync(content).ConfigureAwait(false);
+			pageData.Navigation = await NavigationFor(content).ConfigureAwait(false);
 			return pageData;
 		}
 
@@ -27,8 +27,8 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
 
 		protected INavigationBuilder NavigationBuilder { get; }
 
-		protected virtual IMetadata MetadataFor(IPublishedContent content) => MetadataBuilder.BuildMetadata(content);
+		protected virtual async Task<IMetadata> MetadataForAsync(IPublishedContent content) => await MetadataBuilder.BuildMetadataAsync(content).ConfigureAwait(false);
 
-		protected virtual INavigation NavigationFor(IPublishedContent content) => NavigationBuilder.BuildNavigation(content);
+		protected virtual async Task<INavigation> NavigationFor(IPublishedContent content) => await NavigationBuilder.BuildNavigationAsync(content).ConfigureAwait(false);
 	}
 }
