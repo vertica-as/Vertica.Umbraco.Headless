@@ -64,11 +64,11 @@ namespace Vertica.Umbraco.Headless.Core.Controllers
 			}
 
 			var pageData = await PageDataForAsync(content).ConfigureAwait(false);
-			return IndexFor(pageData, content);
+			return await IndexFor(pageData, content).ConfigureAwait(false);
 		}
 
-		protected virtual IActionResult IndexFor(IPageData pageData, T content)
-			=> OutputRenderer.ActionResult(pageData);
+		protected virtual Task<IActionResult> IndexFor(IPageData pageData, T content)
+			=> Task.FromResult(OutputRenderer.ActionResult(pageData));
 
 		protected virtual async Task<IPageData> PageDataForAsync(T content) 
 			=> await PageDataBuilder.BuildPageDataAsync(content).ConfigureAwait(false);
