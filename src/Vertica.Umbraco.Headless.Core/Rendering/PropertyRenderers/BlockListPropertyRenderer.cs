@@ -18,7 +18,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 		public virtual async Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property,
             IContentElementBuilder contentElementBuilder)
 			=> umbracoValue is IEnumerable<BlockListItem> items
-				? await items.ToArrayAsync(async i => await contentElementBuilder.ContentElementWithSettingsForAsync(i.Content, i.Settings))
-				: null;
+				? await items.ToArrayAsync(async i => await contentElementBuilder.ContentElementWithSettingsForAsync(i.Content, i.Settings).ConfigureAwait(false)).ConfigureAwait(false)
+                : null;
 	}
 }

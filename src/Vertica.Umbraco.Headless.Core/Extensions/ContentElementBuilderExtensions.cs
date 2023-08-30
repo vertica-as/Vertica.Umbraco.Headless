@@ -15,15 +15,15 @@ namespace Vertica.Umbraco.Headless.Core.Extensions
 				return default;
 			}
 
-			return (await contentElementBuilder.PropertyValueForAsync(content, property)) is T value
+			return await contentElementBuilder.PropertyValueForAsync(content, property).ConfigureAwait(false) is T value
 				? value
 				: default;
 		}
 
 		public static async Task<IContentElement> ContentElementForAsync(this IContentElementBuilder contentElementBuilder, IPublishedElement content)
-			=> await contentElementBuilder.ContentElementForAsync<ContentElement>(content);
+			=> await contentElementBuilder.ContentElementForAsync<ContentElement>(content).ConfigureAwait(false);
 
 		public static async Task<ContentElementWithSettings> ContentElementWithSettingsForAsync(this IContentElementBuilder contentElementBuilder, IPublishedElement content, IPublishedElement settings)
-			=> await contentElementBuilder.ContentElementWithSettingsForAsync(content, settings);
+			=> await contentElementBuilder.ContentElementWithSettingsForAsync(content, settings).ConfigureAwait(false);
 	}
 }

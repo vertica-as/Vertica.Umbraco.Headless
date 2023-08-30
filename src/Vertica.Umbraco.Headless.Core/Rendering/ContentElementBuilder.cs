@@ -30,14 +30,14 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
 		        ? new T
 		        {
 			        Alias = content.ContentType.Alias,
-			        Content = await MapElementAsync(content)
-		        }
+			        Content = await MapElementAsync(content).ConfigureAwait(false)
+                }
 		        : null;
 
         public virtual async Task<ContentElementWithSettings> ContentElementWithSettingsForAsync(IPublishedElement content, IPublishedElement settings)
         {
-	        var contentElementWithSettings = await ContentElementForAsync<ContentElementWithSettings>(content);
-	        contentElementWithSettings.Settings = await ContentElementForAsync<ContentElement>(settings);
+	        var contentElementWithSettings = await ContentElementForAsync<ContentElementWithSettings>(content).ConfigureAwait(false);
+	        contentElementWithSettings.Settings = await ContentElementForAsync<ContentElement>(settings).ConfigureAwait(false);
 	        return contentElementWithSettings;
         }
 
@@ -47,7 +47,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
 
 	        var umbracoValue = UmbracoPropertyValueFor(content, property);
 
-	        return await propertyRenderer.ValueForAsync(umbracoValue, property, this);
+	        return await propertyRenderer.ValueForAsync(umbracoValue, property, this).ConfigureAwait(false);
         }
 
         protected virtual object UmbracoPropertyValueFor(IPublishedElement content, IPublishedProperty property) 
@@ -70,9 +70,9 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
             object contentModel = null;
             if (contentModelBuilder != null)
             {
-                contentModel = await contentModelBuilder.BuildContentModelAsync(content, this);
+                contentModel = await contentModelBuilder.BuildContentModelAsync(content, this).ConfigureAwait(false);
             }
-            return contentModel ?? await MapElementDynamicallyAsync(content);
+            return contentModel ?? await MapElementDynamicallyAsync(content).ConfigureAwait(false);
         }
 
         private async Task<object> MapElementDynamicallyAsync(IPublishedElement content)
@@ -86,7 +86,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
 		        {
 			        continue;
 		        }
-		        contentmodelDictionary[property.Alias.ToFirstUpper()] = await PropertyValueForAsync(content, property);
+		        contentmodelDictionary[property.Alias.ToFirstUpper()] = await PropertyValueForAsync(content, property).ConfigureAwait(false);
 	        }
 
             return contentModel;

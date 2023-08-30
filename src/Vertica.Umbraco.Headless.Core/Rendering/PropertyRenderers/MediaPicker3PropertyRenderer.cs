@@ -32,12 +32,12 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 		public async Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property,
             IContentElementBuilder contentElementBuilder)
 		{
-			async Task<Media> CreateMediaAsync(MediaWithCrops media) => await ToMediaAsync(media.Content, media.LocalCrops, contentElementBuilder, _urlProvider, UrlMode.Auto);
+			async Task<Media> CreateMediaAsync(MediaWithCrops media) => await ToMediaAsync(media.Content, media.LocalCrops, contentElementBuilder, _urlProvider, UrlMode.Auto).ConfigureAwait(false);
 
 			return umbracoValue switch
 			{
-				MediaWithCrops item => await CreateMediaAsync(item),
-				IEnumerable<MediaWithCrops> items => await items.ToArrayAsync(CreateMediaAsync),
+				MediaWithCrops item => await CreateMediaAsync(item).ConfigureAwait(false),
+				IEnumerable<MediaWithCrops> items => await items.ToArrayAsync(CreateMediaAsync).ConfigureAwait(false),
 				_ => null
 			};
 		}
@@ -48,7 +48,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
             foreach (var property in media.Properties)
             {
                 if (property.Alias.StartsWith("umbraco") == false) 
-                    additionalProperties.Add(property.Alias, await contentElementBuilder.PropertyValueForAsync(media, property));
+                    additionalProperties.Add(property.Alias, await contentElementBuilder.PropertyValueForAsync(media, property).ConfigureAwait(false));
             }
 
             return new Media(
