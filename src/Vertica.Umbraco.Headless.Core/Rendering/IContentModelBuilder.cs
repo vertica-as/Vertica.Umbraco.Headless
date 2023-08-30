@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -11,6 +12,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
 
 		Type ModelType();
 
-		public Task<object> BuildContentModelAsync(IPublishedElement content, IContentElementBuilder contentElementBuilder);
+		public Task<object> BuildContentModelAsync(IPublishedElement content,
+            IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken);
 	}
 }

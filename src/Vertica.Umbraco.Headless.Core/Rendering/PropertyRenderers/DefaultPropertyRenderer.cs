@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Dynamic;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -13,7 +14,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
         public Type TypeFor(IPublishedPropertyType propertyType) => typeof(object);
 
         public virtual Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property,
-            IContentElementBuilder contentElementBuilder)
+            IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
         {
 	        if (umbracoValue is JObject jObject)
 	        {

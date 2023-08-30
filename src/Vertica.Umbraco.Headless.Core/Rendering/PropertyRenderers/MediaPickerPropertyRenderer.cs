@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -30,12 +30,12 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 				: typeof(Media);
 
 		public virtual async Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property,
-            IContentElementBuilder contentElementBuilder)
+            IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
 		{
 			async Task<Media> CreateMediaAsync(IPublishedContent media)
 			{
 				var imageCropperValue = media.Value<ImageCropperValue>(Constants.Conventions.Media.File);
-				return await MediaPicker3PropertyRenderer.ToMediaAsync(media, imageCropperValue, contentElementBuilder, _urlProvider, UrlMode.Auto).ConfigureAwait(false);
+				return await MediaPicker3PropertyRenderer.ToMediaAsync(media, imageCropperValue, contentElementBuilder, _urlProvider, UrlMode.Auto, cancellationToken).ConfigureAwait(false);
 			}
 
 			return umbracoValue switch

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -23,16 +23,16 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
         }
 
         public virtual async Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property,
-            IContentElementBuilder contentElementBuilder)
+            IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
         {
             if (umbracoValue is IEnumerable<IPublishedElement> items)
             {
-                return await items.ToArrayAsync(async i => await contentElementBuilder.ContentElementForAsync(i).ConfigureAwait(false)).ConfigureAwait(false);
+                return await items.ToArrayAsync(async i => await contentElementBuilder.ContentElementForAsync(i, cancellationToken).ConfigureAwait(false)).ConfigureAwait(false);
             }
 
             if (umbracoValue is IPublishedElement item)
             {
-                return await contentElementBuilder.ContentElementForAsync(item).ConfigureAwait(false);
+                return await contentElementBuilder.ContentElementForAsync(item, cancellationToken).ConfigureAwait(false);
             }
 
             return null;

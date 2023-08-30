@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -30,9 +31,9 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 				: typeof(Media);
 
 		public async Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property,
-            IContentElementBuilder contentElementBuilder)
+            IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
 		{
-			async Task<Media> CreateMediaAsync(MediaWithCrops media) => await ToMediaAsync(media.Content, media.LocalCrops, contentElementBuilder, _urlProvider, UrlMode.Auto).ConfigureAwait(false);
+			async Task<Media> CreateMediaAsync(MediaWithCrops media) => await ToMediaAsync(media.Content, media.LocalCrops, contentElementBuilder, _urlProvider, UrlMode.Auto, cancellationToken).ConfigureAwait(false);
 
 			return umbracoValue switch
 			{
@@ -42,13 +43,18 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 			};
 		}
 
-		internal static async Task<Media> ToMediaAsync(IPublishedContent media, ImageCropperValue imageCropperValue, IContentElementBuilder contentElementBuilder, IUrlProvider urlProvider, UrlMode urlMode)
+		internal static async Task<Media> ToMediaAsync(IPublishedContent media,
+            ImageCropperValue imageCropperValue,
+            IContentElementBuilder contentElementBuilder,
+            IUrlProvider urlProvider,
+            UrlMode urlMode,
+            CancellationToken cancellationToken)
 		{
             var additionalProperties = new Dictionary<string, object>();
             foreach (var property in media.Properties)
             {
                 if (property.Alias.StartsWith("umbraco") == false) 
-                    additionalProperties.Add(property.Alias, await contentElementBuilder.PropertyValueForAsync(media, property).ConfigureAwait(false));
+                    additionalProperties.Add(property.Alias, await contentElementBuilder.PropertyValueForAsync(media, property, cancellationToken).ConfigureAwait(false));
             }
 
             return new Media(
