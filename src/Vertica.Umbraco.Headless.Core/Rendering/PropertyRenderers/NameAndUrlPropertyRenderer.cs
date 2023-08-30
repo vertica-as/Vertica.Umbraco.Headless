@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Vertica.Umbraco.Headless.Core.Models;
@@ -27,7 +28,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 		        : typeof(NameAndUrl);
 
         public virtual Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property,
-            IContentElementBuilder contentElementBuilder)
+            IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
         {
 	        NameAndUrl ToNameAndUrl(IPublishedContent content) => new NameAndUrl(content.Name, _urlProvider.UrlFor(content));
 

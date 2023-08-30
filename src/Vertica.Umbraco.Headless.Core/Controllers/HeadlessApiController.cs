@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -26,18 +27,18 @@ namespace Vertica.Umbraco.Headless.Core.Controllers
 		
 		protected UmbracoHelper UmbracoHelper { get; }
 
-		protected async Task<IActionResult> ContentForAsync(int id)
-			=> await ContentResultForAsync(UmbracoHelper.Content(id)).ConfigureAwait(false);
+		protected async Task<IActionResult> ContentForAsync(int id, CancellationToken cancellationToken)
+			=> await ContentResultForAsync(UmbracoHelper.Content(id), cancellationToken).ConfigureAwait(false);
 
-		protected async Task<IActionResult> ContentForAsync(Guid id)
-			=> await ContentResultForAsync(UmbracoHelper.Content(id)).ConfigureAwait(false);
+		protected async Task<IActionResult> ContentForAsync(Guid id, CancellationToken cancellationToken)
+			=> await ContentResultForAsync(UmbracoHelper.Content(id), cancellationToken).ConfigureAwait(false);
 
-		protected async Task<IActionResult> ContentResultForAsync(IPublishedContent content) 
+		protected async Task<IActionResult> ContentResultForAsync(IPublishedContent content, CancellationToken cancellationToken) 
 			=> content != null
-				? OutputRenderer.ActionResult(await ContentElementForAsync(content).ConfigureAwait(false))
+				? OutputRenderer.ActionResult(await ContentElementForAsync(content, cancellationToken).ConfigureAwait(false))
 				: NotFound();
 
-		protected async Task<IContentElement> ContentElementForAsync(IPublishedContent content) 
-			=> await ContentElementBuilder.ContentElementForAsync(content).ConfigureAwait(false);
+		protected async Task<IContentElement> ContentElementForAsync(IPublishedContent content, CancellationToken cancellationToken) 
+			=> await ContentElementBuilder.ContentElementForAsync(content, cancellationToken).ConfigureAwait(false);
 	}
 }

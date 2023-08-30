@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -17,7 +18,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 				: typeof(string);
 
 		public Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property,
-            IContentElementBuilder contentElementBuilder)
+            IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
 		{
 			return Task.FromResult<object>(umbracoValue switch
             {

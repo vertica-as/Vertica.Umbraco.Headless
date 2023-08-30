@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -28,7 +29,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 		        : typeof(Link[]);
 
         public virtual Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property,
-            IContentElementBuilder contentElementBuilder)
+            IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
         {
 	        Link ToLink(UmbracoLink link) => new Link(link.Name, link.Target, _urlProvider.UrlFor(link), link.Type);
 

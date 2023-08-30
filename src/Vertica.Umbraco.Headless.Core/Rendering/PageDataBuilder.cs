@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Vertica.Umbraco.Headless.Core.Models;
 
@@ -13,11 +14,11 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
 			NavigationBuilder = navigationBuilder;
 		}
 
-		public virtual async Task<IPageData> BuildPageDataAsync(IPublishedContent content)
-		{
-			var pageData = await ContentElementBuilder.ContentElementForAsync<PageData>(content).ConfigureAwait(false);
-			pageData.Metadata = await MetadataForAsync(content).ConfigureAwait(false);
-			pageData.Navigation = await NavigationFor(content).ConfigureAwait(false);
+		public virtual async Task<IPageData> BuildPageDataAsync(IPublishedContent content, CancellationToken cancellationToken)
+        {
+			var pageData = await ContentElementBuilder.ContentElementForAsync<PageData>(content, cancellationToken).ConfigureAwait(false);
+			pageData.Metadata = await MetadataForAsync(content, cancellationToken).ConfigureAwait(false);
+			pageData.Navigation = await NavigationFor(content, cancellationToken).ConfigureAwait(false);
 			return pageData;
 		}
 
@@ -27,8 +28,10 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
 
 		protected INavigationBuilder NavigationBuilder { get; }
 
-		protected virtual async Task<IMetadata> MetadataForAsync(IPublishedContent content) => await MetadataBuilder.BuildMetadataAsync(content).ConfigureAwait(false);
+		protected virtual async Task<IMetadata> MetadataForAsync(IPublishedContent content, CancellationToken cancellationToken) => 
+            await MetadataBuilder.BuildMetadataAsync(content, cancellationToken).ConfigureAwait(false);
 
-		protected virtual async Task<INavigation> NavigationFor(IPublishedContent content) => await NavigationBuilder.BuildNavigationAsync(content).ConfigureAwait(false);
+		protected virtual async Task<INavigation> NavigationFor(IPublishedContent content, CancellationToken cancellationToken) => 
+            await NavigationBuilder.BuildNavigationAsync(content, cancellationToken).ConfigureAwait(false);
 	}
 }

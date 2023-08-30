@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
@@ -9,7 +10,8 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
 {
 	public class MetadataBuilder : IMetadataBuilder
 	{
-		public virtual Task<IMetadata> BuildMetadataAsync(IPublishedContent content) => Task.FromResult<IMetadata>(BuildMetadata<Metadata>(content));
+		public virtual Task<IMetadata> BuildMetadataAsync(IPublishedContent content, CancellationToken cancellationToken) => 
+            Task.FromResult<IMetadata>(BuildMetadata<Metadata>(content));
 
 		protected TMetadata BuildMetadata<TMetadata>(IPublishedContent content) where TMetadata : class, IMetadata, new()
 			=> new TMetadata
