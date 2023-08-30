@@ -17,7 +17,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 				? typeof(ColorAndLabel)
 				: typeof(string);
 
-		public Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+		public Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property,
             IContentElementBuilder contentElementBuilder)
 			=> Task.FromResult(umbracoValue is ColorPickerValueConverter.PickedColor pickedColor
                 ? new ColorAndLabel(pickedColor.Color, pickedColor.Label)

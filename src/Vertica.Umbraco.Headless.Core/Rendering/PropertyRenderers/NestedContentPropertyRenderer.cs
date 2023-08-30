@@ -22,17 +22,17 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 		        : typeof(IContentElement[]);
         }
 
-        public virtual async Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+        public virtual async Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property,
             IContentElementBuilder contentElementBuilder)
         {
             if (umbracoValue is IEnumerable<IPublishedElement> items)
             {
-                return await items.ToArrayAsync(async i => await contentElementBuilder.ContentElementFor(i));
+                return await items.ToArrayAsync(async i => await contentElementBuilder.ContentElementForAsync(i));
             }
 
             if (umbracoValue is IPublishedElement item)
             {
-                return await contentElementBuilder.ContentElementFor(item);
+                return await contentElementBuilder.ContentElementForAsync(item);
             }
 
             return null;

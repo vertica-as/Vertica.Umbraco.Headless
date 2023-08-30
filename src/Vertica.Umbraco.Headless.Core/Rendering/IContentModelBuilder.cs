@@ -11,6 +11,6 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
 
 		Type ModelType();
 
-		public Task<object> BuildContentModel(IPublishedElement content, IContentElementBuilder contentElementBuilder);
+		public Task<object> BuildContentModelAsync(IPublishedElement content, IContentElementBuilder contentElementBuilder);
 	}
 }

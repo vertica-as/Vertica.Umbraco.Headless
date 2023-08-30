@@ -6,6 +6,6 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
 {
 	public interface IPageDataBuilder
 	{
-		Task<IPageData> BuildPageData(IPublishedContent content);
+		Task<IPageData> BuildPageDataAsync(IPublishedContent content);
 	}
 }

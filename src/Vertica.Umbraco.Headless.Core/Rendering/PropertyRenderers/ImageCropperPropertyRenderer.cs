@@ -13,7 +13,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 
 		public Type TypeFor(IPublishedPropertyType propertyType) => typeof(ImageCrop);
 
-		public virtual Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+		public virtual Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property,
             IContentElementBuilder contentElementBuilder)
 		{
 			return Task.FromResult<object>(umbracoValue is ImageCropperValue imageCropperValue

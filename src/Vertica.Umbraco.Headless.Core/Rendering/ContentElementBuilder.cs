@@ -24,30 +24,30 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
 	        _renderingService = renderingService;
         }
 
-        public virtual async Task<T> ContentElementFor<T>(IPublishedElement content)
+        public virtual async Task<T> ContentElementForAsync<T>(IPublishedElement content)
 	        where T : class, IContentElement, new()
 	        => content != null
 		        ? new T
 		        {
 			        Alias = content.ContentType.Alias,
-			        Content = await MapElement(content)
+			        Content = await MapElementAsync(content)
 		        }
 		        : null;
 
-        public virtual async Task<ContentElementWithSettings> ContentElementWithSettingsFor(IPublishedElement content, IPublishedElement settings)
+        public virtual async Task<ContentElementWithSettings> ContentElementWithSettingsForAsync(IPublishedElement content, IPublishedElement settings)
         {
-	        var contentElementWithSettings = await ContentElementFor<ContentElementWithSettings>(content);
-	        contentElementWithSettings.Settings = await ContentElementFor<ContentElement>(settings);
+	        var contentElementWithSettings = await ContentElementForAsync<ContentElementWithSettings>(content);
+	        contentElementWithSettings.Settings = await ContentElementForAsync<ContentElement>(settings);
 	        return contentElementWithSettings;
         }
 
-        public virtual async Task<object> PropertyValueFor(IPublishedElement content, IPublishedProperty property)
+        public virtual async Task<object> PropertyValueForAsync(IPublishedElement content, IPublishedProperty property)
         {
 	        var propertyRenderer = _renderingService.PropertyRendererFor(content.ContentType.GetPropertyType(property.Alias));
 
 	        var umbracoValue = UmbracoPropertyValueFor(content, property);
 
-	        return await propertyRenderer.ValueFor(umbracoValue, property, this);
+	        return await propertyRenderer.ValueForAsync(umbracoValue, property, this);
         }
 
         protected virtual object UmbracoPropertyValueFor(IPublishedElement content, IPublishedProperty property) 
@@ -59,7 +59,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
         protected virtual bool ShouldIgnoreProperty(IPublishedElement content, IPublishedProperty property) 
 	        => false;
 
-        private async Task<object> MapElement(IPublishedElement content)
+        private async Task<object> MapElementAsync(IPublishedElement content)
         {
 	        if (content == null)
 	        {
@@ -70,12 +70,12 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
             object contentModel = null;
             if (contentModelBuilder != null)
             {
-                contentModel = await contentModelBuilder.BuildContentModel(content, this);
+                contentModel = await contentModelBuilder.BuildContentModelAsync(content, this);
             }
-            return contentModel ?? await MapElementDynamically(content);
+            return contentModel ?? await MapElementDynamicallyAsync(content);
         }
 
-        private async Task<object> MapElementDynamically(IPublishedElement content)
+        private async Task<object> MapElementDynamicallyAsync(IPublishedElement content)
         {
 	        var contentModel = new ExpandoObject();
 	        IDictionary<string, object> contentmodelDictionary = contentModel;
@@ -86,7 +86,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
 		        {
 			        continue;
 		        }
-		        contentmodelDictionary[property.Alias.ToFirstUpper()] = await PropertyValueFor(content, property);
+		        contentmodelDictionary[property.Alias.ToFirstUpper()] = await PropertyValueForAsync(content, property);
 	        }
 
             return contentModel;

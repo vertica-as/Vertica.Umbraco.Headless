@@ -16,7 +16,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 				? typeof(string[])
 				: typeof(string);
 
-		public Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+		public Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property,
             IContentElementBuilder contentElementBuilder)
 		{
 			return Task.FromResult<object>(umbracoValue switch

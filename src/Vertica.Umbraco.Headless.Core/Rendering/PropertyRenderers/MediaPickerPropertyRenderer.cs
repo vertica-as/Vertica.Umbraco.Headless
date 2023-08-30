@@ -29,19 +29,19 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 				? typeof(Media[])
 				: typeof(Media);
 
-		public virtual async Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+		public virtual async Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property,
             IContentElementBuilder contentElementBuilder)
 		{
-			async Task<Media> CreateMedia(IPublishedContent media)
+			async Task<Media> CreateMediaAsync(IPublishedContent media)
 			{
 				var imageCropperValue = media.Value<ImageCropperValue>(Constants.Conventions.Media.File);
-				return await MediaPicker3PropertyRenderer.ToMedia(media, imageCropperValue, contentElementBuilder, _urlProvider, UrlMode.Auto);
+				return await MediaPicker3PropertyRenderer.ToMediaAsync(media, imageCropperValue, contentElementBuilder, _urlProvider, UrlMode.Auto);
 			}
 
 			return umbracoValue switch
 			{
-				IPublishedContent item => await CreateMedia(item),
-				IEnumerable<IPublishedContent> items => await items.ToArrayAsync(CreateMedia),
+				IPublishedContent item => await CreateMediaAsync(item),
+				IEnumerable<IPublishedContent> items => await items.ToArrayAsync(CreateMediaAsync),
 				_ => null
 			};
 		}

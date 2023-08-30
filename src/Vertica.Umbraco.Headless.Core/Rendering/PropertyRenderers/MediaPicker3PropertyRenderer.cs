@@ -29,26 +29,26 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 				? typeof(Media[])
 				: typeof(Media);
 
-		public async Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+		public async Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property,
             IContentElementBuilder contentElementBuilder)
 		{
-			async Task<Media> CreateMedia(MediaWithCrops media) => await ToMedia(media.Content, media.LocalCrops, contentElementBuilder, _urlProvider, UrlMode.Auto);
+			async Task<Media> CreateMediaAsync(MediaWithCrops media) => await ToMediaAsync(media.Content, media.LocalCrops, contentElementBuilder, _urlProvider, UrlMode.Auto);
 
 			return umbracoValue switch
 			{
-				MediaWithCrops item => await CreateMedia(item),
-				IEnumerable<MediaWithCrops> items => await items.ToArrayAsync(CreateMedia),
+				MediaWithCrops item => await CreateMediaAsync(item),
+				IEnumerable<MediaWithCrops> items => await items.ToArrayAsync(CreateMediaAsync),
 				_ => null
 			};
 		}
 
-		internal static async Task<Media> ToMedia(IPublishedContent media, ImageCropperValue imageCropperValue, IContentElementBuilder contentElementBuilder, IUrlProvider urlProvider, UrlMode urlMode)
+		internal static async Task<Media> ToMediaAsync(IPublishedContent media, ImageCropperValue imageCropperValue, IContentElementBuilder contentElementBuilder, IUrlProvider urlProvider, UrlMode urlMode)
 		{
             var additionalProperties = new Dictionary<string, object>();
             foreach (var property in media.Properties)
             {
                 if (property.Alias.StartsWith("umbraco") == false) 
-                    additionalProperties.Add(property.Alias, await contentElementBuilder.PropertyValueFor(media, property));
+                    additionalProperties.Add(property.Alias, await contentElementBuilder.PropertyValueForAsync(media, property));
             }
 
             return new Media(

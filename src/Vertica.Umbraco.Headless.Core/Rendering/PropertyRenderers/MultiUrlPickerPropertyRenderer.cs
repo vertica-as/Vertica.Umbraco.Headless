@@ -27,7 +27,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 		        ? typeof(Link)
 		        : typeof(Link[]);
 
-        public virtual Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+        public virtual Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property,
             IContentElementBuilder contentElementBuilder)
         {
 	        Link ToLink(UmbracoLink link) => new Link(link.Name, link.Target, _urlProvider.UrlFor(link), link.Type);
