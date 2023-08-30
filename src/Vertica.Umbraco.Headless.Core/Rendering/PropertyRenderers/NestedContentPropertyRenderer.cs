@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core;
@@ -27,7 +28,10 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
         {
             if (umbracoValue is IEnumerable<IPublishedElement> items)
             {
-                return await items.ToArrayAsync(async i => await contentElementBuilder.ContentElementForAsync(i, cancellationToken).ConfigureAwait(false)).ConfigureAwait(false);
+                return await items
+                    .Select(i => contentElementBuilder.ContentElementForAsync(i, cancellationToken))
+                    .ToArrayAsync()
+                    .ConfigureAwait(false);
             }
 
             if (umbracoValue is IPublishedElement item)

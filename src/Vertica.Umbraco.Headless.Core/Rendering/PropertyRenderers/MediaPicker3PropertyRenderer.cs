@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core;
@@ -38,7 +39,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 			return umbracoValue switch
 			{
 				MediaWithCrops item => await CreateMediaAsync(item).ConfigureAwait(false),
-				IEnumerable<MediaWithCrops> items => await items.ToArrayAsync(CreateMediaAsync).ConfigureAwait(false),
+				IEnumerable<MediaWithCrops> items => await items.Select(CreateMediaAsync).ToArrayAsync().ConfigureAwait(false),
 				_ => null
 			};
 		}

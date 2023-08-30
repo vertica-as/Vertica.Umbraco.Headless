@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core;
@@ -19,8 +20,17 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
         public virtual async Task<object> ValueForAsync(object umbracoValue,
             IPublishedProperty property,
             IContentElementBuilder contentElementBuilder,
-            CancellationToken cancellationToken) => umbracoValue is IEnumerable<BlockListItem> items
-                ? await items.ToArrayAsync(async i => await contentElementBuilder.ContentElementWithSettingsForAsync(i.Content, i.Settings, cancellationToken).ConfigureAwait(false)).ConfigureAwait(false)
-                : null;
+            CancellationToken cancellationToken)
+        {
+            if (umbracoValue is IEnumerable<BlockListItem> items)
+            {
+                return await items
+                    .Select(i => contentElementBuilder.ContentElementWithSettingsForAsync(i.Content, i.Settings, cancellationToken))
+                    .ToArrayAsync()
+                    .ConfigureAwait(false);
+            }
+
+            return null;
+        }
     }
 }
