@@ -13,7 +13,7 @@ namespace Vertica.Umbraco.Headless.Core.Extensions
             var list = new List<TResult>();
             foreach (var item in source)
             {
-                var result = await func(item);
+                var result = await func(item).ConfigureAwait(false);
                 list.Add(result);
             }
             return list.ToArray();

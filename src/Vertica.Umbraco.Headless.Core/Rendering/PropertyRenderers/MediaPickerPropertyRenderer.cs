@@ -35,13 +35,13 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 			async Task<Media> CreateMediaAsync(IPublishedContent media)
 			{
 				var imageCropperValue = media.Value<ImageCropperValue>(Constants.Conventions.Media.File);
-				return await MediaPicker3PropertyRenderer.ToMediaAsync(media, imageCropperValue, contentElementBuilder, _urlProvider, UrlMode.Auto);
+				return await MediaPicker3PropertyRenderer.ToMediaAsync(media, imageCropperValue, contentElementBuilder, _urlProvider, UrlMode.Auto).ConfigureAwait(false);
 			}
 
 			return umbracoValue switch
 			{
-				IPublishedContent item => await CreateMediaAsync(item),
-				IEnumerable<IPublishedContent> items => await items.ToArrayAsync(CreateMediaAsync),
+				IPublishedContent item => await CreateMediaAsync(item).ConfigureAwait(false),
+				IEnumerable<IPublishedContent> items => await items.ToArrayAsync(CreateMediaAsync).ConfigureAwait(false),
 				_ => null
 			};
 		}

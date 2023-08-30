@@ -15,7 +15,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
 
 		public virtual async Task<IPageData> BuildPageDataAsync(IPublishedContent content)
 		{
-			var pageData = await ContentElementBuilder.ContentElementForAsync<PageData>(content);
+			var pageData = await ContentElementBuilder.ContentElementForAsync<PageData>(content).ConfigureAwait(false);
 			pageData.Metadata = MetadataFor(content);
 			pageData.Navigation = NavigationFor(content);
 			return pageData;

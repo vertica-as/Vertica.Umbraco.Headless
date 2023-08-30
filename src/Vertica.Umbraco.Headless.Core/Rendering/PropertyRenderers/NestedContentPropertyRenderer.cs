@@ -27,12 +27,12 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
         {
             if (umbracoValue is IEnumerable<IPublishedElement> items)
             {
-                return await items.ToArrayAsync(async i => await contentElementBuilder.ContentElementForAsync(i));
+                return await items.ToArrayAsync(async i => await contentElementBuilder.ContentElementForAsync(i).ConfigureAwait(false)).ConfigureAwait(false);
             }
 
             if (umbracoValue is IPublishedElement item)
             {
-                return await contentElementBuilder.ContentElementForAsync(item);
+                return await contentElementBuilder.ContentElementForAsync(item).ConfigureAwait(false);
             }
 
             return null;

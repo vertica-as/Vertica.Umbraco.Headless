@@ -10,7 +10,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
 
 		public abstract string ContentTypeAlias();
 
-		public async Task<object> BuildContentModelAsync(IPublishedElement content, IContentElementBuilder contentElementBuilder) => await BuildModelAsync(content, contentElementBuilder);
+		public async Task<object> BuildContentModelAsync(IPublishedElement content, IContentElementBuilder contentElementBuilder) => await BuildModelAsync(content, contentElementBuilder).ConfigureAwait(false);
 
         protected abstract Task<T> BuildModelAsync(IPublishedElement content, IContentElementBuilder contentElementBuilder);
 	}

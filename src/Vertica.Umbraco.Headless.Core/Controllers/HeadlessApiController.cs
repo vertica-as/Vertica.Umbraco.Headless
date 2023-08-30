@@ -27,17 +27,17 @@ namespace Vertica.Umbraco.Headless.Core.Controllers
 		protected UmbracoHelper UmbracoHelper { get; }
 
 		protected async Task<IActionResult> ContentForAsync(int id)
-			=> await ContentResultForAsync(UmbracoHelper.Content(id));
+			=> await ContentResultForAsync(UmbracoHelper.Content(id)).ConfigureAwait(false);
 
 		protected async Task<IActionResult> ContentForAsync(Guid id)
-			=> await ContentResultForAsync(UmbracoHelper.Content(id));
+			=> await ContentResultForAsync(UmbracoHelper.Content(id)).ConfigureAwait(false);
 
 		protected async Task<IActionResult> ContentResultForAsync(IPublishedContent content) 
 			=> content != null
-				? OutputRenderer.ActionResult(await ContentElementForAsync(content))
+				? OutputRenderer.ActionResult(await ContentElementForAsync(content).ConfigureAwait(false))
 				: NotFound();
 
 		protected async Task<IContentElement> ContentElementForAsync(IPublishedContent content) 
-			=> await ContentElementBuilder.ContentElementForAsync(content);
+			=> await ContentElementBuilder.ContentElementForAsync(content).ConfigureAwait(false);
 	}
 }
