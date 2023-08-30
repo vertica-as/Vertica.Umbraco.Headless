@@ -20,10 +20,10 @@ jobs:
       id: set_release_version
       run: |
         gittag=${{ github.ref }}
-        [[ $gittag =~ v(.+) ]]
+        [[ $gittag =~ v(([0-9]+\.[0-9]+\.[0-9]+)(-.+)?) ]]
         echo "releaseversion=${BASH_REMATCH[1]}" >> $GITHUB_ENV
         echo "releasename=${BASH_REMATCH[0]}" >> $GITHUB_ENV
-        echo "assemblyversion=${BASH_REMATCH[1]}.${{github.run_number}}" >> $GITHUB_ENV
+        echo "assemblyversion=${BASH_REMATCH[2]}.${{github.run_number}}" >> $GITHUB_ENV
     - uses: actions/checkout@v3
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
