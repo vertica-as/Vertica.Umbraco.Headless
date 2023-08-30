@@ -26,7 +26,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 		        ? typeof(NameAndUrl[])
 		        : typeof(NameAndUrl);
 
-        public virtual Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+        public virtual Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property,
             IContentElementBuilder contentElementBuilder)
         {
 	        NameAndUrl ToNameAndUrl(IPublishedContent content) => new NameAndUrl(content.Name, _urlProvider.UrlFor(content));

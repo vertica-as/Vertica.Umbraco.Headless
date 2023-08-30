@@ -63,14 +63,14 @@ namespace Vertica.Umbraco.Headless.Core.Controllers
 				throw new ArgumentException("Wrong type of content", nameof(CurrentPage));
 			}
 
-			var pageData = await PageDataFor(content);
+			var pageData = await PageDataForAsync(content);
 			return IndexFor(pageData, content);
 		}
 
 		protected virtual IActionResult IndexFor(IPageData pageData, T content)
 			=> OutputRenderer.ActionResult(pageData);
 
-		protected virtual async Task<IPageData> PageDataFor(T content) 
-			=> await PageDataBuilder.BuildPageData(content);
+		protected virtual async Task<IPageData> PageDataForAsync(T content) 
+			=> await PageDataBuilder.BuildPageDataAsync(content);
 	}
 }

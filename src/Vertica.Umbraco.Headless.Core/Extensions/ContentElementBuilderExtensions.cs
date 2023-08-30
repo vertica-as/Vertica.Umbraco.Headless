@@ -7,7 +7,7 @@ namespace Vertica.Umbraco.Headless.Core.Extensions
 {
 	public static class ContentElementBuilderExtensions
 	{
-		public static async Task<T> RenderedValueFor<T>(this IContentElementBuilder contentElementBuilder, IPublishedElement content, string propertyAlias)
+		public static async Task<T> RenderedValueForAsync<T>(this IContentElementBuilder contentElementBuilder, IPublishedElement content, string propertyAlias)
 		{
 			var property = content.GetProperty(propertyAlias);
 			if (property == null)
@@ -15,15 +15,15 @@ namespace Vertica.Umbraco.Headless.Core.Extensions
 				return default;
 			}
 
-			return (await contentElementBuilder.PropertyValueFor(content, property)) is T value
+			return (await contentElementBuilder.PropertyValueForAsync(content, property)) is T value
 				? value
 				: default;
 		}
 
-		public static async Task<IContentElement> ContentElementFor(this IContentElementBuilder contentElementBuilder, IPublishedElement content)
-			=> await contentElementBuilder.ContentElementFor<ContentElement>(content);
+		public static async Task<IContentElement> ContentElementForAsync(this IContentElementBuilder contentElementBuilder, IPublishedElement content)
+			=> await contentElementBuilder.ContentElementForAsync<ContentElement>(content);
 
-		public static async Task<ContentElementWithSettings> ContentElementWithSettingsFor(this IContentElementBuilder contentElementBuilder, IPublishedElement content, IPublishedElement settings)
-			=> await contentElementBuilder.ContentElementWithSettingsFor(content, settings);
+		public static async Task<ContentElementWithSettings> ContentElementWithSettingsForAsync(this IContentElementBuilder contentElementBuilder, IPublishedElement content, IPublishedElement settings)
+			=> await contentElementBuilder.ContentElementWithSettingsForAsync(content, settings);
 	}
 }

@@ -15,10 +15,10 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 
 		public Type TypeFor(IPublishedPropertyType propertyType) => typeof(ContentElementWithSettings[]);
 
-		public virtual async Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+		public virtual async Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property,
             IContentElementBuilder contentElementBuilder)
 			=> umbracoValue is IEnumerable<BlockListItem> items
-				? await items.ToArrayAsync(async i => await contentElementBuilder.ContentElementWithSettingsFor(i.Content, i.Settings))
+				? await items.ToArrayAsync(async i => await contentElementBuilder.ContentElementWithSettingsForAsync(i.Content, i.Settings))
 				: null;
 	}
 }

@@ -11,7 +11,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering
 
         Type TypeFor(IPublishedPropertyType propertyType);
 
-        Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+        Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property,
             IContentElementBuilder contentElementBuilder);
     }
 }

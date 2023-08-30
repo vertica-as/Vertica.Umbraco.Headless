@@ -12,7 +12,7 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 
         public Type TypeFor(IPublishedPropertyType propertyType) => typeof(object);
 
-        public virtual Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+        public virtual Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property,
             IContentElementBuilder contentElementBuilder)
         {
 	        if (umbracoValue is JObject jObject)
