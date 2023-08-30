@@ -26,17 +26,17 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 		        ? typeof(NameAndUrl[])
 		        : typeof(NameAndUrl);
 
-        public virtual async Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+        public virtual Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
             IContentElementBuilder contentElementBuilder)
         {
 	        NameAndUrl ToNameAndUrl(IPublishedContent content) => new NameAndUrl(content.Name, _urlProvider.UrlFor(content));
 
-	        return umbracoValue switch
-	        {
-		        IPublishedContent item => ToNameAndUrl(item),
-		        IEnumerable<IPublishedContent> items => items.Select(ToNameAndUrl).ToArray(),
-		        _ => null
-	        };
+	        return Task.FromResult<object>(umbracoValue switch
+            {
+                IPublishedContent item => ToNameAndUrl(item),
+                IEnumerable<IPublishedContent> items => items.Select(ToNameAndUrl).ToArray(),
+                _ => null
+            });
         }
     }
 }

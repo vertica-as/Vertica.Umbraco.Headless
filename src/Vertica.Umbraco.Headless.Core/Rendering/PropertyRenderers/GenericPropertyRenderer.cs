@@ -10,8 +10,8 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 
 		public Type TypeFor(IPublishedPropertyType propertyType) => typeof(T);
 
-		public async Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+		public Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
             IContentElementBuilder contentElementBuilder)
-			=> umbracoValue is T value ? value : default;
+			=> Task.FromResult<object>(umbracoValue is T value ? value : default);
 	}
 }
