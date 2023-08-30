@@ -27,17 +27,17 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 		        ? typeof(Link)
 		        : typeof(Link[]);
 
-        public virtual async Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+        public virtual Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
             IContentElementBuilder contentElementBuilder)
         {
 	        Link ToLink(UmbracoLink link) => new Link(link.Name, link.Target, _urlProvider.UrlFor(link), link.Type);
 
-	        return umbracoValue switch
-	        {
-		        UmbracoLink link => ToLink(link),
-		        IEnumerable<UmbracoLink> links => links.Select(ToLink).ToArray(),
-		        _ => null
-	        };
+	        return Task.FromResult<object>(umbracoValue switch
+            {
+                UmbracoLink link => ToLink(link),
+                IEnumerable<UmbracoLink> links => links.Select(ToLink).ToArray(),
+                _ => null
+            });
         }
     }
 }

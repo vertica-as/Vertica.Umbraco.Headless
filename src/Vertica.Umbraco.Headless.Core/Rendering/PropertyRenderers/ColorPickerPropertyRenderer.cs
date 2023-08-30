@@ -17,12 +17,12 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 				? typeof(ColorAndLabel)
 				: typeof(string);
 
-		public async Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+		public Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
             IContentElementBuilder contentElementBuilder)
-			=> umbracoValue is ColorPickerValueConverter.PickedColor pickedColor
-				? new ColorAndLabel(pickedColor.Color, pickedColor.Label)
-				: umbracoValue is string
-					? umbracoValue
-					: null;
+			=> Task.FromResult(umbracoValue is ColorPickerValueConverter.PickedColor pickedColor
+                ? new ColorAndLabel(pickedColor.Color, pickedColor.Label)
+                : umbracoValue is string
+                    ? umbracoValue
+                    : null);
 	}
 }

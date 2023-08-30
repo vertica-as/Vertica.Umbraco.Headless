@@ -17,15 +17,15 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.PropertyRenderers
 				? typeof(DecimalRange) 
 				: typeof(decimal);
 
-		public async Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
+		public Task<object> ValueFor(object umbracoValue, IPublishedProperty property,
             IContentElementBuilder contentElementBuilder)
 		{
-			return umbracoValue switch
-			{
-				Range<decimal> range => new DecimalRange(range.Minimum, range.Maximum),
-				decimal value => value,
-				_ => 0m
-			};
+			return Task.FromResult<object>(umbracoValue switch
+            {
+                Range<decimal> range => new DecimalRange(range.Minimum, range.Maximum),
+                decimal value => value,
+                _ => 0m
+            });
 		}
 	}
 }
