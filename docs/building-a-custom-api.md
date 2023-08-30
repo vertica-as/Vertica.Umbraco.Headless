@@ -13,7 +13,8 @@ public class HeadlessContentApiController : HeadlessApiController
   }
 
   // get headless content by Umbraco content ID
-  public IActionResult Content(int id) => ContentFor(id);
+  public async Task<IActionResult> Content(int id, CancellationToken cancellationToken) => 
+    await ContentForAsync(id, cancellationToken);
 }
 ```
 
@@ -29,5 +30,5 @@ You can use dependency injection to obtain both services, along with any other s
 The flow of your API methods will likely look like this:
 
 1. Query Umbraco to obtain whatever content your API method should serve as output.
-2. Use `IContentElementBuilder.ContentElementFor(...)` to create `IContentElement` instances for the obtained content.
-3. Use `IOutputRenderer.ActionResultFor(...)` to serialize the API output in a manner consistent with any other VUHF output in your project.
+2. Use `IContentElementBuilder.ContentElementForAsync(...)` to create `IContentElement` instances for the obtained content.
+3. Use `IOutputRenderer.ActionResult(...)` to serialize the API output in a manner consistent with any other VUHF output in your project.

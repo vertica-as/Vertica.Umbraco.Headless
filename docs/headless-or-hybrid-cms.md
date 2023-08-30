@@ -23,13 +23,13 @@ public class HeadlessHybridRenderController : HeadlessRenderController
 {
   // ...
 
-  protected override IActionResult IndexFor(IPageData pageData, IPublishedContent content)
+  protected override async Task<IActionResult> IndexFor(IPageData pageData, IPublishedContent content, CancellationToken cancellationToken)
   {
     var isHeadlessRequest = "application/json".Equals(Request.ContentType, StringComparison.OrdinalIgnoreCase);
-
+  
     return isHeadlessRequest
       // let VUHF handle the request	
-      ? base.IndexFor(pageData, content)
+      ? await base.IndexFor(pageData, content, cancellationToken)
       // let Umbracos rendering handle the request	
       : CurrentTemplate(content);
   }
