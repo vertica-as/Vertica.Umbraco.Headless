@@ -1,19 +1,22 @@
-﻿/**
- * Copyright (c) 2022 Vertica
+/**
+ * Copyright (c) 2023 Vertica
  * Copyright (c) 2023 I-ology
  */
 
-using System.Linq;
-using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Extensions;
 using Iology.HeadlessUmbraco.Core.Extensions;
 using Iology.HeadlessUmbraco.Core.Models;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Extensions;
 
 namespace Iology.HeadlessUmbraco.Core.Rendering;
 
 public class MetadataBuilder : IMetadataBuilder
 {
-	public virtual IMetadata BuildMetadata(IPublishedContent content) => BuildMetadata<Metadata>(content);
+	public virtual Task<IMetadata> BuildMetadataAsync(IPublishedContent content, CancellationToken cancellationToken)
+        => Task.FromResult<IMetadata>(BuildMetadata<Metadata>(content));
 
 	protected TMetadata BuildMetadata<TMetadata>(IPublishedContent content) where TMetadata : class, IMetadata, new()
 		=> new TMetadata

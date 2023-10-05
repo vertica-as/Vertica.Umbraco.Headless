@@ -1,16 +1,18 @@
-﻿/**
- * Copyright (c) 2022 Vertica
+/**
+ * Copyright (c) 2023 Vertica
  * Copyright (c) 2023 I-ology
  */
 
+using Iology.HeadlessUmbraco.Core.Extensions;
+using Iology.HeadlessUmbraco.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
-using Iology.HeadlessUmbraco.Core.Extensions;
-using Iology.HeadlessUmbraco.Core.Models;
 
 namespace Iology.HeadlessUmbraco.Core.Rendering.PropertyRenderers;
 
@@ -26,16 +28,19 @@ public class NestedContentPropertyRenderer : IPropertyRenderer
 		    : typeof(IContentElement[]);
     }
 
-    public virtual object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder)
+    public virtual async Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
     {
         if (umbracoValue is IEnumerable<IPublishedElement> items)
         {
-            return items.Select(contentElementBuilder.ContentElementFor).ToArray();
+            return await items
+                .Select(i => contentElementBuilder.ContentElementForAsync(i, cancellationToken))
+                .ToArrayAsync()
+                .ConfigureAwait(false);
         }
 
         if (umbracoValue is IPublishedElement item)
         {
-            return contentElementBuilder.ContentElementFor(item);
+            return await contentElementBuilder.ContentElementForAsync(item, cancellationToken).ConfigureAwait(false);
         }
 
         return null;

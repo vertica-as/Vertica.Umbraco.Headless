@@ -1,14 +1,16 @@
-﻿/**
- * Copyright (c) 2022 Vertica
+/**
+ * Copyright (c) 2023 Vertica
  * Copyright (c) 2023 I-ology
  */
 
+using Iology.HeadlessUmbraco.Core.Models;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
-using Iology.HeadlessUmbraco.Core.Models;
 
 namespace Iology.HeadlessUmbraco.Core.Rendering.PropertyRenderers;
 
@@ -21,10 +23,10 @@ public class ColorPickerPropertyRenderer : IPropertyRenderer
 			? typeof(ColorAndLabel)
 			: typeof(string);
 
-	public object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder)
-		=> umbracoValue is ColorPickerValueConverter.PickedColor pickedColor
-			? new ColorAndLabel(pickedColor.Color, pickedColor.Label)
-			: umbracoValue is string
-				? umbracoValue
-				: null;
+	public Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
+		=> Task.FromResult(umbracoValue is ColorPickerValueConverter.PickedColor pickedColor
+            ? new ColorAndLabel(pickedColor.Color, pickedColor.Label)
+            : umbracoValue is string
+                ? umbracoValue
+                : null);
 }

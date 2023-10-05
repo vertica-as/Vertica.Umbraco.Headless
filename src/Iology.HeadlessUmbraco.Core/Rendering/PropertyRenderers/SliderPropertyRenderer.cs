@@ -1,14 +1,16 @@
-﻿/**
- * Copyright (c) 2022 Vertica
+/**
+ * Copyright (c) 2023 Vertica
  * Copyright (c) 2023 I-ology
  */
 
+using Iology.HeadlessUmbraco.Core.Models;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
-using Iology.HeadlessUmbraco.Core.Models;
 
 namespace Iology.HeadlessUmbraco.Core.Rendering.PropertyRenderers;
 
@@ -21,13 +23,13 @@ public class SliderPropertyRenderer : IPropertyRenderer
 			? typeof(DecimalRange) 
 			: typeof(decimal);
 
-	public object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder)
+	public Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
 	{
-		return umbracoValue switch
-		{
-			Range<decimal> range => new DecimalRange(range.Minimum, range.Maximum),
-			decimal value => value,
-			_ => 0m
-		};
-	}
+        return Task.FromResult<object>(umbracoValue switch
+        {
+            Range<decimal> range => new DecimalRange(range.Minimum, range.Maximum),
+            decimal value => value,
+            _ => 0m
+        });
+    }
 }

@@ -1,15 +1,18 @@
-﻿/**
- * Copyright (c) 2022 Vertica
+/**
+ * Copyright (c) 2023 Vertica
  * Copyright (c) 2023 I-ology
  */
 
+using Iology.HeadlessUmbraco.Core.Extensions;
+using Iology.HeadlessUmbraco.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Iology.HeadlessUmbraco.Core.Models;
 
 namespace Iology.HeadlessUmbraco.Core.Rendering.PropertyRenderers;
 
@@ -19,8 +22,16 @@ public class BlockListPropertyRenderer : IPropertyRenderer
 
 	public Type TypeFor(IPublishedPropertyType propertyType) => typeof(ContentElementWithSettings[]);
 
-	public virtual object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder)
-		=> umbracoValue is IEnumerable<BlockListItem> items
-			? items.Select(i => contentElementBuilder.ContentElementWithSettingsFor(i.Content, i.Settings)).ToArray()
-			: null;
+	public virtual async Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
+    {
+        if (umbracoValue is IEnumerable<BlockListItem> items)
+        {
+            return await items
+                .Select(i => contentElementBuilder.ContentElementWithSettingsForAsync(i.Content, i.Settings, cancellationToken))
+                .ToArrayAsync()
+                .ConfigureAwait(false);
+        }
+
+        return null;
+    }
 }

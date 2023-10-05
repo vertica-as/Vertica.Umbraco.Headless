@@ -1,13 +1,15 @@
-﻿/**
- * Copyright (c) 2022 Vertica
+/**
+ * Copyright (c) 2023 Vertica
  * Copyright (c) 2023 I-ology
  */
 
+using Iology.HeadlessUmbraco.Core.Models;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
-using Iology.HeadlessUmbraco.Core.Models;
 
 namespace Iology.HeadlessUmbraco.Core.Rendering.PropertyRenderers;
 
@@ -17,10 +19,10 @@ public class ImageCropperPropertyRenderer : IPropertyRenderer
 
 	public Type TypeFor(IPublishedPropertyType propertyType) => typeof(ImageCrop);
 
-	public virtual object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder)
+	public virtual Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
 	{
-		return umbracoValue is ImageCropperValue imageCropperValue
-			? new ImageCrop(imageCropperValue.Src, imageCropperValue)
-			: null;
+		return Task.FromResult<object>(umbracoValue is ImageCropperValue imageCropperValue
+            ? new ImageCrop(imageCropperValue.Src, imageCropperValue)
+            : null);
 	}
 }

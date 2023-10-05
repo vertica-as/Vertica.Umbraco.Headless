@@ -1,14 +1,16 @@
-﻿/**
- * Copyright (c) 2022 Vertica
+/**
+ * Copyright (c) 2023 Vertica
  * Copyright (c) 2023 I-ology
  */
 
+using Iology.HeadlessUmbraco.Core.Models;
+using Iology.HeadlessUmbraco.Core.Rendering.Providers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Iology.HeadlessUmbraco.Core.Models;
-using Iology.HeadlessUmbraco.Core.Rendering.Providers;
 
 namespace Iology.HeadlessUmbraco.Core.Rendering.PropertyRenderers;
 
@@ -30,15 +32,15 @@ public abstract class NameAndUrlPropertyRenderer : IPropertyRenderer
 		    ? typeof(NameAndUrl[])
 		    : typeof(NameAndUrl);
 
-    public virtual object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder)
+    public virtual Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
     {
 	    NameAndUrl ToNameAndUrl(IPublishedContent content) => new NameAndUrl(content.Name, _urlProvider.UrlFor(content));
 
-	    return umbracoValue switch
-	    {
-		    IPublishedContent item => ToNameAndUrl(item),
-		    IEnumerable<IPublishedContent> items => items.Select(ToNameAndUrl).ToArray(),
-		    _ => null
-	    };
+        return Task.FromResult<object>(umbracoValue switch
+        {
+            IPublishedContent item => ToNameAndUrl(item),
+            IEnumerable<IPublishedContent> items => items.Select(ToNameAndUrl).ToArray(),
+            _ => null
+        });
     }
 }

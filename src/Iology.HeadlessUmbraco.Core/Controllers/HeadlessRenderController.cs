@@ -1,18 +1,20 @@
-﻿/**
- * Copyright (c) 2022 Vertica
+/**
+ * Copyright (c) 2023 Vertica
  * Copyright (c) 2023 I-ology
  */
 
-using System;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
-using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Web.Common.Controllers;
 using Iology.HeadlessUmbraco.Core.Models;
 using Iology.HeadlessUmbraco.Core.Rendering;
 using Iology.HeadlessUmbraco.Core.Rendering.Output;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
+using System.Threading;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Common.Controllers;
 
 namespace Iology.HeadlessUmbraco.Core.Controllers;
 
@@ -53,20 +55,26 @@ public abstract class HeadlessRenderController<T> : RenderController where T : I
 		
 	protected IPageDataBuilder PageDataBuilder { get; }
 
-	public override IActionResult Index()
-	{
-		if (!(CurrentPage is T content))
-		{
-			throw new ArgumentException("Wrong type of content", nameof(CurrentPage));
-		}
+    [NonAction]
+    public override IActionResult Index()
+    {
+        throw new NotSupportedException("Sync rendering is not supported");
+    }
 
-		var pageData = PageDataFor(content);
-		return IndexFor(pageData, content);
-	}
+    public async Task<IActionResult> Index(CancellationToken cancellationToken)
+    {
+        if (!(CurrentPage is T content))
+        {
+            throw new ArgumentException("Wrong type of content", nameof(CurrentPage));
+        }
 
-	protected virtual IActionResult IndexFor(IPageData pageData, T content)
-		=> OutputRenderer.ActionResult(pageData);
+        var pageData = await PageDataForAsync(content, cancellationToken).ConfigureAwait(false);
+        return await IndexForAsync(pageData, content, cancellationToken).ConfigureAwait(false);
+    }
 
-	protected virtual IPageData PageDataFor(T content) 
-		=> PageDataBuilder.BuildPageData(content);
+    protected virtual Task<IActionResult> IndexForAsync(IPageData pageData, T content, CancellationToken cancellationToken)
+        => Task.FromResult(OutputRenderer.ActionResult(pageData));
+
+    protected virtual async Task<IPageData> PageDataForAsync(T content, CancellationToken cancellationToken)
+        => await PageDataBuilder.BuildPageDataAsync(content, cancellationToken).ConfigureAwait(false);
 }

@@ -1,9 +1,11 @@
-﻿/**
- * Copyright (c) 2022 Vertica
+/**
+ * Copyright (c) 2023 Vertica
  * Copyright (c) 2023 I-ology
  */
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Iology.HeadlessUmbraco.Core.Rendering.PropertyRenderers;
@@ -14,5 +16,6 @@ public abstract class UnsupportedPropertyRenderer : IPropertyRenderer
 
 	public Type TypeFor(IPublishedPropertyType propertyType) => typeof(object);
 
-	public object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder) => null;
+	public Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
+        => Task.FromResult<object>(null);
 }

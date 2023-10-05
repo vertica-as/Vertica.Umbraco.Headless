@@ -1,10 +1,12 @@
-﻿/**
- * Copyright (c) 2022 Vertica
+/**
+ * Copyright (c) 2023 Vertica
  * Copyright (c) 2023 I-ology
  */
 
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Iology.HeadlessUmbraco.Core.Models;
+using System.Threading;
+using System.Threading.Tasks;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Iology.HeadlessUmbraco.Core.Rendering;
 
@@ -17,11 +19,11 @@ public class PageDataBuilder : IPageDataBuilder
 		NavigationBuilder = navigationBuilder;
 	}
 
-	public virtual IPageData BuildPageData(IPublishedContent content)
+	public virtual async Task<IPageData> BuildPageDataAsync(IPublishedContent content, CancellationToken cancellationToken)
 	{
-		var pageData = ContentElementBuilder.ContentElementFor<PageData>(content);
-		pageData.Metadata = MetadataFor(content);
-		pageData.Navigation = NavigationFor(content);
+        var pageData = await ContentElementBuilder.ContentElementForAsync<PageData>(content, cancellationToken).ConfigureAwait(false);
+		pageData.Metadata = await MetadataForAsync(content, cancellationToken).ConfigureAwait(false);
+		pageData.Navigation = await NavigationForAsync(content, cancellationToken).ConfigureAwait(false);
 		return pageData;
 	}
 
@@ -31,7 +33,9 @@ public class PageDataBuilder : IPageDataBuilder
 
 	protected INavigationBuilder NavigationBuilder { get; }
 
-	protected virtual IMetadata MetadataFor(IPublishedContent content) => MetadataBuilder.BuildMetadata(content);
+	protected virtual async Task<IMetadata> MetadataForAsync(IPublishedContent content, CancellationToken cancellationToken)
+        => await MetadataBuilder.BuildMetadataAsync(content, cancellationToken).ConfigureAwait(false);
 
-	protected virtual INavigation NavigationFor(IPublishedContent content) => NavigationBuilder.BuildNavigation(content);
+	protected virtual async Task<INavigation> NavigationForAsync(IPublishedContent content, CancellationToken cancellationToken)
+        => await NavigationBuilder.BuildNavigationAsync(content, cancellationToken).ConfigureAwait(false);
 }
