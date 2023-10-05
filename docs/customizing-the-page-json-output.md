@@ -2,7 +2,7 @@
 
 The following covers the most common extension points for the page JSON output. If you haven't already, read [Exploring the JSON format](exploring-the-json-format.md) before diving into this.
 
-## Additional data in `metadata` and/or `navigation` 
+## Additional data in `metadata` and/or `navigation`
 
 To tweak the `metadata` and/or `navigation` output, you have to create your own implementations the interfaces [`IMetadataBuilder`](../src/Iology.HeadlessUmbraco.Core/Rendering/IMetadataBuilder.cs) and/or [`INavigationBuilder`](../src/Iology.HeadlessUmbraco.Core/Rendering/INavigationBuilder.cs) respectively. To keep your implementations simple you can opt to expand upon the core implementations rather than building your own from scratch.
 
@@ -23,7 +23,7 @@ public class MyNavigation : Navigation
 // Custom navigation builder that includes a secondary navigation in the default navigation output
 public class MyNavigationBuilder : NavigationBuilder
 {
-  public override INavigation BuildNavigation(IPublishedContent content)
+  public override Task<INavigation> BuildNavigationAsync(IPublishedContent content, CancellationToken cancellationToken)
   {
     // Add the default navigation data to our custom navigation class
     var myNavigation = base.BuildNavigation<MyNavigation>(content);
@@ -31,7 +31,7 @@ public class MyNavigationBuilder : NavigationBuilder
     // Add our secondary navigation (root level children) - NameAndUrl is a core class, we'll reuse it here
     myNavigation.Secondary = content.AncestorOrSelf(2).Children.Select(c => new NameAndUrl(c.Name, c.Url())).ToArray();
 
-    return myNavigation;
+    return Task.FromResult<INavigation>(myNavigation);
   }
 }
 
@@ -44,15 +44,15 @@ public class MyMetadata : Metadata
 // Our custom metadata builder that adds last modified to the default metadata output
 public class MyMetadataBuilder : MetadataBuilder
 {
-  public override IMetadata BuildMetadata(IPublishedContent content)
+  public override Task<IMetadata> BuildMetadataAsync(IPublishedContent content, CancellationToken cancellationToken)
   {
     // Add the default metadata to our custom metadata class
     var myMetadata = base.BuildMetadata<MyMetadata>(content);
 
-    // Add last modified date 
+    // Add last modified date
     myMetadata.LastModified = content.UpdateDate;
 
-    return myMetadata;
+    return Task.FromResult<IMetadata>(myMetadata);
   }
 }
 ```
@@ -67,7 +67,7 @@ public void ConfigureServices(IServiceCollection services)
     .AddHeadless()
     .Build();
 
-  // Replace the default navigation and metadata builders  
+  // Replace the default navigation and metadata builders
   services.AddSingleton<INavigationBuilder, MyNavigationBuilder>();
   services.AddSingleton<IMetadataBuilder, MyMetadataBuilder>();
 }
@@ -102,13 +102,13 @@ public class HomeContentModelBuilder : IContentModelBuilder
 
   public Type ModelType() => typeof(HomeContentModel);
 
-  public object BuildContentModel(IPublishedElement content, IContentElementBuilder contentElementBuilder)
-    => new HomeContentModel
+  public Task<object> BuildContentModelAsync(IPublishedElement content, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
+    => Task.FromResult<object>(new HomeContentModel
     {
-      TheTitle = content.Value<string>("title"),
-      TheIntro = content.Value<string>("intro"),
-      IsPreview = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode
-    };
+        TheTitle = content.Value<string>("title"),
+        TheIntro = content.Value<string>("intro"),
+        IsPreview = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode
+    });
 }
 
 // This is the custom content model
@@ -122,19 +122,19 @@ public class HomeContentModel
 }
 ```
 
-*Note: This sample implementation is based solely on `IPublishedContent`. If you're using ModelsBuilder to generate C# classes, you can simplify it and get rid of the magic property name strings.*
+_Note: This sample implementation is based solely on `IPublishedContent`. If you're using ModelsBuilder to generate C# classes, you can simplify it and get rid of the magic property name strings._
 
 ### What is that `IContentElementBuilder` parameter?
 
 In short: `IContentElementBuilder` is responsible for stitching everything together when I-ology HeadlessUmbraco creates JSON output for Umbraco content. This means that `IContentElementBuilder` is responsible for extracting Umbraco property values when creating dynamically generated content models.
 
-As long as your factory method only has to extract simple Umbraco properties for your custom content model (like the sample above), you probably don't need to worry about `IContentElementBuilder`. 
+As long as your factory method only has to extract simple Umbraco properties for your custom content model (like the sample above), you probably don't need to worry about `IContentElementBuilder`.
 
-If you find yourself wanting to use the [built-in property rendering](property-renderering.md) for complex Umbraco properties (i.e. Media or Block List rendering), you can use `IContentElementBuilder` to extract Umbraco property values in your factory implementation - like this: `contentElementBuilder.RenderedValueFor<Media>(content, "image")`. 
+If you find yourself wanting to use the [built-in property rendering](property-renderering.md) for complex Umbraco properties (i.e. Media or Block List rendering), you can use `IContentElementBuilder` to extract Umbraco property values in your factory implementation - like this: `await contentElementBuilder.RenderedValueForAsync<Media>(content, "image", cancellationToken)`.
 
 ## Creating your own `RenderController`
 
-All I-ology HeadlessUmbraco outut builds on top of the default Umbraco request pipeline. Thus all requests are handled by implementations of `RenderController`. Upon installation, I-ology HeadlessUmbraco adds a default `RenderController` to handle all requests that are not specifically handled by other `RenderController` implementations. 
+All I-ology HeadlessUmbraco outut builds on top of the default Umbraco request pipeline. Thus all requests are handled by implementations of `RenderController`. Upon installation, I-ology HeadlessUmbraco adds a default `RenderController` to handle all requests that are not specifically handled by other `RenderController` implementations.
 
 You may eventually find it handy to create your own `RenderController` to manage request state. In that case you either want to:
 
@@ -142,7 +142,7 @@ You may eventually find it handy to create your own `RenderController` to manage
 - Create `RenderController` implementations to handle requests for specific page types, or
 - All of the above
 
-A custom I-ology HeadlessUmbraco `RenderController` is created as an implementation of [`HeadlessRenderController`](../src/Iology.HeadlessUmbraco.Core/Controllers/HeadlessRenderController.cs). 
+A custom I-ology HeadlessUmbraco `RenderController` is created as an implementation of [`HeadlessRenderController`](../src/Iology.HeadlessUmbraco.Core/Controllers/HeadlessRenderController.cs).
 
 When creating `RenderController` implementations for specific page types, and if you're using ModelsBuilder to generate C# classes, you can choose to implement `HeadlessRenderController<T>` instead (where `T` is your page type). This will give you strongly typed access to the page content in your implementation.
 
@@ -151,11 +151,11 @@ using Iology.HeadlessUmbraco.Core.Controllers;
 
 // ...
 
-public class MyDefaultRenderController : HeadlessRenderController { 
+public class MyDefaultRenderController : HeadlessRenderController {
   // ...
 }
 
-public class MyConcretePageRenderController : HeadlessRenderController<MyConcretePage> { 
+public class MyConcretePageRenderController : HeadlessRenderController<MyConcretePage> {
   // ...
 }
 ```
@@ -180,5 +180,4 @@ If you're looking to use I-ology HeadlessUmbraco only for select areas of your c
 
 You can customize the entire page output (the container for `alias`, `content`, `metadata` and `navigation`) in the same manner as is shown above for `metadata` and `navigation` - by creating your own implementation of the interface [`IPageDataBuilder`](../src/Iology.HeadlessUmbraco.Core/Rendering/IPageDataBuilder.cs) and swapping the default implementation with your own in `Startup`.
 
-
-This extension point is mostly mentioned here for the sake of completion. If you're considering a customized page output, you should probably first consider if a custom content model is a better fit for your needs. 
+This extension point is mostly mentioned here for the sake of completion. If you're considering a customized page output, you should probably first consider if a custom content model is a better fit for your needs.

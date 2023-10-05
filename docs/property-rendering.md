@@ -47,7 +47,7 @@ The output from Block List and Nested Content properties is created in the same 
 
 ## Custom property editors
 
-When I-ology HeadlessUmbraco encounters an Umbraco property editor, that does not have a corresponding property renderer (i.e. editors from 3rd party add-ons), it returns the raw value from the editor's property value converter in the JSON output. This might very well be perfectly fine or it might not be, depending on both your use case and the editor implementation. 
+When I-ology HeadlessUmbraco encounters an Umbraco property editor, that does not have a corresponding property renderer (i.e. editors from 3rd party add-ons), it returns the raw value from the editor's property value converter in the JSON output. This might very well be perfectly fine or it might not be, depending on both your use case and the editor implementation.
 
 If the raw value is not useful, you can create a custom property renderer for the property editor by implementing the [`IPropertyRenderer`](../src/Iology.HeadlessUmbraco.Core/Rendering/IPropertyRenderer.cs) interface - see the sample in the next section, or browse all [built-in property renderers](../src/Iology.HeadlessUmbraco.Core/Rendering/PropertyRenderers) for inspiration.
 
@@ -69,24 +69,24 @@ public class MyTextBoxPropertyRenderer : IPropertyRenderer
     _umbracoContextAccessor = umbracoContextAccessor;
   }
 
-  // This property renderer handles textbox properties  
+  // This property renderer handles textbox properties
   public string PropertyEditorAlias => Constants.PropertyEditors.Aliases.TextBox;
 
   // This property renderer always returns a string value
   public Type TypeFor(IPublishedPropertyType propertyType) => typeof(string);
 
   // Extract the property value
-  public object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder)
+  public Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
   {
-  	// Expecting a string value for Textbox properties
-  	if (!(umbracoValue is string value))
-  	{
-      return null;
-  	}
+    // Expecting a string value for Textbox properties
+    if (!(umbracoValue is string value))
+    {
+      return Task.FromResult<object>(null);
+    }
 
-  	// Append " (preview mode)" to the property value if the current context is a preview
-  	var isPreview = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode;
-  	return $"{value} {(isPreview ? " (preview mode)" : "")}";
+    // Append " (preview mode)" to the property value if the current context is a preview
+    var isPreview = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode;
+    return Task.FromResult<object>($"{value} {(isPreview ? " (preview mode)" : "")}");
   }
 }
 ```
