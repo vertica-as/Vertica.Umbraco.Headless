@@ -18,7 +18,7 @@ public class DefaultPropertyRenderer : IPropertyRenderer
 
     public Type TypeFor(IPublishedPropertyType propertyType) => typeof(object);
 
-    public virtual async Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
+    public virtual Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
     {
 	    if (umbracoValue is JObject jObject)
 	    {
