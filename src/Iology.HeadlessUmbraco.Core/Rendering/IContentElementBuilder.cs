@@ -1,18 +1,21 @@
-﻿/**
- * Copyright (c) 2022 Vertica
+/**
+ * Copyright (c) 2023 Vertica
  * Copyright (c) 2023 I-ology
  */
 
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Iology.HeadlessUmbraco.Core.Models;
+using System.Threading;
+using System.Threading.Tasks;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Iology.HeadlessUmbraco.Core.Rendering;
 
 public interface IContentElementBuilder
 {
-	T ContentElementFor<T>(IPublishedElement content) where T : class, IContentElement, new();
+    Task<T> ContentElementForAsync<T>(IPublishedElement content, CancellationToken cancellationToken)
+        where T : class, IContentElement, new();
 
-	ContentElementWithSettings ContentElementWithSettingsFor(IPublishedElement content, IPublishedElement settings);
+    Task<ContentElementWithSettings> ContentElementWithSettingsForAsync(IPublishedElement content, IPublishedElement settings, CancellationToken cancellationToken);
 
-    object PropertyValueFor(IPublishedElement content, IPublishedProperty property);
+    Task<object> PropertyValueForAsync(IPublishedElement content, IPublishedProperty property, CancellationToken cancellationToken);
 }

@@ -1,18 +1,21 @@
-﻿/**
- * Copyright (c) 2022 Vertica
+/**
+ * Copyright (c) 2023 Vertica
  * Copyright (c) 2023 I-ology
  */
 
+using Iology.HeadlessUmbraco.Core.Extensions;
+using Iology.HeadlessUmbraco.Core.Rendering.Providers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Extensions;
-using Iology.HeadlessUmbraco.Core.Rendering.Providers;
 using Media = Iology.HeadlessUmbraco.Core.Models.Media;
 
 namespace Iology.HeadlessUmbraco.Core.Rendering.PropertyRenderers;
@@ -33,36 +36,41 @@ public class MediaPicker3PropertyRenderer : IPropertyRenderer
 			? typeof(Media[])
 			: typeof(Media);
 
-	public object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder)
+	public async Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
 	{
-		Media CreateMedia(MediaWithCrops media) => ToMedia(media.Content, media.LocalCrops, contentElementBuilder, _urlProvider, UrlMode.Auto);
+        async Task<Media> CreateMediaAsync(MediaWithCrops media) => await ToMediaAsync(media.Content, media.LocalCrops, contentElementBuilder, _urlProvider, UrlMode.Auto, cancellationToken).ConfigureAwait(false);
 
-		return umbracoValue switch
-		{
-			MediaWithCrops item => CreateMedia(item),
-			IEnumerable<MediaWithCrops> items => items.Select(CreateMedia).ToArray(),
-			_ => null
-		};
-	}
+        return umbracoValue switch
+        {
+            MediaWithCrops item => await CreateMediaAsync(item).ConfigureAwait(false),
+            IEnumerable<MediaWithCrops> items => await items.Select(CreateMediaAsync).ToArrayAsync().ConfigureAwait(false),
+            _ => null
+        };
+    }
 
-	internal static Media ToMedia(IPublishedContent media, ImageCropperValue imageCropperValue, IContentElementBuilder contentElementBuilder, IUrlProvider urlProvider, UrlMode urlMode)
+	internal static async Task<Media> ToMediaAsync(
+        IPublishedContent media,
+        ImageCropperValue imageCropperValue,
+        IContentElementBuilder contentElementBuilder,
+        IUrlProvider urlProvider,
+        UrlMode urlMode,
+        CancellationToken cancellationToken)
 	{
-		var additionalProperties = media
-			.Properties
-			.Where(property => property.Alias.StartsWith("umbraco") == false)
-			.ToDictionary(
-				property => property.Alias,
-				property => contentElementBuilder.PropertyValueFor(media, property)
-			);
+        var additionalProperties = new Dictionary<string, object>();
+        foreach (var property in media.Properties)
+        {
+            if (property.Alias.StartsWith("umbraco") == false)
+                additionalProperties.Add(property.Alias, await contentElementBuilder.PropertyValueForAsync(media, property, cancellationToken).ConfigureAwait(false));
+        }
 
-		return new Media(
-			media.Name,
-			urlProvider.UrlFor(media, urlMode),
-			media.Value<int>(Constants.Conventions.Media.Width),
-			media.Value<int>(Constants.Conventions.Media.Height),
-			media.Value<string>(Constants.Conventions.Media.Extension),
-			imageCropperValue,
-			additionalProperties
-		);
-	}
+        return new Media(
+            media.Name,
+            urlProvider.UrlFor(media, urlMode),
+            media.Value<int>(Constants.Conventions.Media.Width),
+            media.Value<int>(Constants.Conventions.Media.Height),
+            media.Value<string>(Constants.Conventions.Media.Extension),
+            imageCropperValue,
+            additionalProperties
+        );
+    }
 }

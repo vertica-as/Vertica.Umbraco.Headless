@@ -1,10 +1,13 @@
-﻿/**
+/**
  * Copyright (c) 2023 I-ology
  */
 
+using Iology.HeadlessUmbraco.Core.Extensions;
 using Iology.HeadlessUmbraco.Core.Models;
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -17,39 +20,39 @@ public class BlockGridPropertyRenderer : IPropertyRenderer
 
     public Type TypeFor(IPublishedPropertyType propertyType) => typeof(BlockGrid);
 
-    public virtual object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder)
+    public virtual async Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
     {
         return umbracoValue is BlockGridModel grid ?
             new BlockGrid
             {
                 GridColumns = grid.GridColumns,
-                Blocks = grid.Select(i => BlockGridElementFor(contentElementBuilder, i)).ToArray()
+                Blocks = await grid.Select(i => BlockGridElementForAsync(contentElementBuilder, i, cancellationToken)).ToArrayAsync().ConfigureAwait(false)
             } : null;
     }
 
-    private BlockGridElement BlockGridElementFor(IContentElementBuilder builder, BlockGridItem item)
+    private async Task<BlockGridElement> BlockGridElementForAsync(IContentElementBuilder builder, BlockGridItem item, CancellationToken cancellationToken)
     {
-        var contentElementWithSettings = builder.ContentElementFor<BlockGridElement>(item.Content);
-        contentElementWithSettings.Settings = builder.ContentElementFor<ContentElement>(item.Settings);
+        var contentElementWithSettings = await builder.ContentElementForAsync<BlockGridElement>(item.Content, cancellationToken).ConfigureAwait(false);
+        contentElementWithSettings.Settings = await builder.ContentElementForAsync<ContentElement>(item.Settings, cancellationToken).ConfigureAwait(false);
 
         contentElementWithSettings.RowSpan = item.RowSpan;
         contentElementWithSettings.ColumnSpan = item.ColumnSpan;
         contentElementWithSettings.AreaGridColumns = item.AreaGridColumns;
-        contentElementWithSettings.Areas = item.Areas?.Any() == true ?
-            item.Areas.Select(area => BlockGridAreaElementFor(builder, area)) :
-            null;
+        contentElementWithSettings.Areas = item.Areas?.Any() == true
+            ? await item.Areas.Select(area => BlockGridAreaElementForAsync(builder, area, cancellationToken)).ToArrayAsync().ConfigureAwait(false)
+            : null;
 
         return contentElementWithSettings;
     }
 
-    private BlockGridAreaElement BlockGridAreaElementFor(IContentElementBuilder builder, BlockGridArea area)
+    private async Task<BlockGridAreaElement> BlockGridAreaElementForAsync(IContentElementBuilder builder, BlockGridArea area, CancellationToken cancellationToken)
     {
         return new BlockGridAreaElement
         {
             Alias = area.Alias,
             ColumnSpan = area.ColumnSpan,
             RowSpan = area.RowSpan,
-            Blocks = area.Select(block => BlockGridElementFor(builder, block))
+            Blocks = await area.Select(block => BlockGridElementForAsync(builder, block, cancellationToken)).ToArrayAsync().ConfigureAwait(false)
         };
     }
 }

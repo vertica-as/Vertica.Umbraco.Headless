@@ -1,14 +1,16 @@
-﻿/**
- * Copyright (c) 2022 Vertica
+/**
+ * Copyright (c) 2023 Vertica
  * Copyright (c) 2023 I-ology
  */
 
-using System.Collections.Generic;
-using System.Dynamic;
-using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Extensions;
 using Iology.HeadlessUmbraco.Core.Models;
 using Iology.HeadlessUmbraco.Core.Rendering.Providers;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Threading;
+using System.Threading.Tasks;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Extensions;
 
 namespace Iology.HeadlessUmbraco.Core.Rendering;
 
@@ -28,30 +30,30 @@ public class ContentElementBuilder : IContentElementBuilder
 	    _renderingService = renderingService;
     }
 
-    public virtual T ContentElementFor<T>(IPublishedElement content)
+    public virtual async Task<T> ContentElementForAsync<T>(IPublishedElement content, CancellationToken cancellationToken)
 	    where T : class, IContentElement, new()
 	    => content != null
 		    ? new T
 		    {
 			    Alias = content.ContentType.Alias,
-			    Content = MapElement(content)
+			    Content = await MapElementAsync(content, cancellationToken).ConfigureAwait(false)
 		    }
 		    : null;
 
-    public virtual ContentElementWithSettings ContentElementWithSettingsFor(IPublishedElement content, IPublishedElement settings)
+    public virtual async Task<ContentElementWithSettings> ContentElementWithSettingsForAsync(IPublishedElement content, IPublishedElement settings, CancellationToken cancellationToken)
     {
-	    var contentElementWithSettings = ContentElementFor<ContentElementWithSettings>(content);
-	    contentElementWithSettings.Settings = ContentElementFor<ContentElement>(settings);
+	    var contentElementWithSettings = await ContentElementForAsync<ContentElementWithSettings>(content, cancellationToken).ConfigureAwait(false);
+	    contentElementWithSettings.Settings = await ContentElementForAsync<ContentElement>(settings, cancellationToken).ConfigureAwait(false);
 	    return contentElementWithSettings;
     }
 
-    public virtual object PropertyValueFor(IPublishedElement content, IPublishedProperty property)
+    public virtual async Task<object> PropertyValueForAsync(IPublishedElement content, IPublishedProperty property, CancellationToken cancellationToken)
     {
 	    var propertyRenderer = _renderingService.PropertyRendererFor(content.ContentType.GetPropertyType(property.Alias));
 
 	    var umbracoValue = UmbracoPropertyValueFor(content, property);
 
-	    return propertyRenderer.ValueFor(umbracoValue, property, this);
+        return await propertyRenderer.ValueForAsync(umbracoValue, property, this, cancellationToken).ConfigureAwait(false);
     }
 
     protected virtual object UmbracoPropertyValueFor(IPublishedElement content, IPublishedProperty property) 
@@ -63,7 +65,7 @@ public class ContentElementBuilder : IContentElementBuilder
     protected virtual bool ShouldIgnoreProperty(IPublishedElement content, IPublishedProperty property) 
 	    => false;
 
-    private object MapElement(IPublishedElement content)
+    private async Task<object> MapElementAsync(IPublishedElement content, CancellationToken cancellationToken)
     {
 	    if (content == null)
 	    {
@@ -71,10 +73,15 @@ public class ContentElementBuilder : IContentElementBuilder
 	    }
 
 	    var contentModelBuilder = _renderingService.ContentModelBuilderFor(content.ContentType);
-        return contentModelBuilder?.BuildContentModel(content, this) ?? MapElementDynamically(content);
+        object contentModel = null;
+        if (contentModelBuilder != null)
+        {
+            contentModel = await contentModelBuilder.BuildContentModelAsync(content, this, cancellationToken).ConfigureAwait(false);
+        }
+        return contentModel ?? await MapElementDynamicallyAsync(content, cancellationToken).ConfigureAwait(false);
     }
 
-    private object MapElementDynamically(IPublishedElement content)
+    private async Task<object> MapElementDynamicallyAsync(IPublishedElement content, CancellationToken cancellationToken)
     {
 	    var contentModel = new ExpandoObject();
 	    IDictionary<string, object> contentmodelDictionary = contentModel;
@@ -85,7 +92,7 @@ public class ContentElementBuilder : IContentElementBuilder
 		    {
 			    continue;
 		    }
-		    contentmodelDictionary[property.Alias.ToFirstUpper()] = PropertyValueFor(content, property);
+		    contentmodelDictionary[property.Alias.ToFirstUpper()] = await PropertyValueForAsync(content, property, cancellationToken).ConfigureAwait(false);
 	    }
 
         return contentModel;

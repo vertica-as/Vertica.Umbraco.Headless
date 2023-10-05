@@ -1,10 +1,12 @@
-﻿/**
- * Copyright (c) 2022 Vertica
+/**
+ * Copyright (c) 2023 Vertica
  * Copyright (c) 2023 I-ology
  */
 
 using System;
 using System.Dynamic;
+using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
@@ -16,13 +18,13 @@ public class DefaultPropertyRenderer : IPropertyRenderer
 
     public Type TypeFor(IPublishedPropertyType propertyType) => typeof(object);
 
-    public virtual object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder)
+    public virtual Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
     {
 	    if (umbracoValue is JObject jObject)
 	    {
-		    return jObject.ToObject<ExpandoObject>();
+		    return Task.FromResult<object>(jObject.ToObject<ExpandoObject>());
 	    }
 
-	    return umbracoValue;
+	    return Task.FromResult(umbracoValue);
     }
 }

@@ -1,16 +1,18 @@
-﻿/**
- * Copyright (c) 2022 Vertica
+/**
+ * Copyright (c) 2023 Vertica
  * Copyright (c) 2023 I-ology
  */
 
+using Iology.HeadlessUmbraco.Core.Models;
+using Iology.HeadlessUmbraco.Core.Rendering.Providers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
-using Iology.HeadlessUmbraco.Core.Models;
-using Iology.HeadlessUmbraco.Core.Rendering.Providers;
 using UmbracoLink = Umbraco.Cms.Core.Models.Link;
 
 namespace Iology.HeadlessUmbraco.Core.Rendering.PropertyRenderers;
@@ -31,15 +33,15 @@ public class MultiUrlPickerPropertyRenderer : IPropertyRenderer
 		    ? typeof(Link)
 		    : typeof(Link[]);
 
-    public virtual object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder)
+    public virtual Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
     {
-	    Link ToLink(UmbracoLink link) => new Link(link.Name, link.Target, _urlProvider.UrlFor(link), link.Type);
+        Link ToLink(UmbracoLink link) => new Link(link.Name, link.Target, _urlProvider.UrlFor(link), link.Type);
 
-	    return umbracoValue switch
-	    {
-		    UmbracoLink link => ToLink(link),
-		    IEnumerable<UmbracoLink> links => links.Select(ToLink).ToArray(),
-		    _ => null
-	    };
+        return Task.FromResult<object>(umbracoValue switch
+        {
+            UmbracoLink link => ToLink(link),
+            IEnumerable<UmbracoLink> links => links.Select(ToLink).ToArray(),
+            _ => null
+        });
     }
 }

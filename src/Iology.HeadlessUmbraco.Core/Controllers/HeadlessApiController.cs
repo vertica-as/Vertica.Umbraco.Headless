@@ -1,17 +1,19 @@
-﻿/**
- * Copyright (c) 2022 Vertica
+/**
+ * Copyright (c) 2023 Vertica
  * Copyright (c) 2023 I-ology
  */
 
-using System;
-using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Web.Common;
-using Umbraco.Cms.Web.Common.Controllers;
 using Iology.HeadlessUmbraco.Core.Extensions;
 using Iology.HeadlessUmbraco.Core.Models;
 using Iology.HeadlessUmbraco.Core.Rendering;
 using Iology.HeadlessUmbraco.Core.Rendering.Output;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Web.Common;
+using Umbraco.Cms.Web.Common.Controllers;
 
 namespace Iology.HeadlessUmbraco.Core.Controllers;
 
@@ -30,17 +32,17 @@ public abstract class HeadlessApiController : UmbracoApiController
 		
 	protected UmbracoHelper UmbracoHelper { get; }
 
-	protected IActionResult ContentFor(int id)
-		=> ContentResultFor(UmbracoHelper.Content(id));
+	protected async Task<IActionResult> ContentForAsync(int id, CancellationToken cancellationToken)
+		=> await ContentResultForAsync(UmbracoHelper.Content(id), cancellationToken).ConfigureAwait(false);
 
-	protected IActionResult ContentFor(Guid id)
-		=> ContentResultFor(UmbracoHelper.Content(id));
+	protected async Task<IActionResult> ContentForAsync(Guid id, CancellationToken cancellationToken)
+		=> await ContentResultForAsync(UmbracoHelper.Content(id), cancellationToken).ConfigureAwait(false);
 
-	protected IActionResult ContentResultFor(IPublishedContent content) 
+	protected async Task<IActionResult> ContentResultForAsync(IPublishedContent content, CancellationToken cancellationToken) 
 		=> content != null
-			? OutputRenderer.ActionResult(ContentElementFor(content))
+			? OutputRenderer.ActionResult(await ContentElementForAsync(content, cancellationToken).ConfigureAwait(false))
 			: NotFound();
 
-	protected IContentElement ContentElementFor(IPublishedContent content) 
-		=> ContentElementBuilder.ContentElementFor(content);
+	protected async Task<IContentElement> ContentElementForAsync(IPublishedContent content, CancellationToken cancellationToken) 
+		=> await ContentElementBuilder.ContentElementForAsync(content, cancellationToken).ConfigureAwait(false);
 }

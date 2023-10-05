@@ -1,14 +1,16 @@
-﻿/**
- * Copyright (c) 2022 Vertica
+/**
+ * Copyright (c) 2023 Vertica
  * Copyright (c) 2023 I-ology
  */
 
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Iology.HeadlessUmbraco.Core.Models;
+using System.Threading;
+using System.Threading.Tasks;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Iology.HeadlessUmbraco.Core.Rendering;
 
 public interface INavigationBuilder
 {
-	INavigation BuildNavigation(IPublishedContent content);
+	Task<INavigation> BuildNavigationAsync(IPublishedContent content, CancellationToken cancellationToken);
 }

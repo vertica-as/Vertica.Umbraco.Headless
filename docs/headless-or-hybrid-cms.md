@@ -2,7 +2,7 @@
 
 A headless CMS is a great component in a truly decoupled architecture. But it's not necessarily the right fit for every scenario. Sometimes it makes sense to have the CMS serve content both as head and in a headless manner.
 
-This approach is often called *hybrid CMS*.
+This approach is often called _hybrid CMS_.
 
 A hybrid CMS is characterized by using traditional CMS templating and rendering capabilities for serving the website output, while exposing the same content headlessly for other channels.
 
@@ -14,7 +14,7 @@ Let's explore that in depth. But first - if you haven't already, go ahead and re
 
 ## A hybrid `RenderController`
 
-First of all we need replace the default `RenderController` with our own implementation. This new controller will output content either as rendered HTML (using Umbraco's Razor templating) or as JSON (using I-ology HeadlessUmbraco) depending on the state of the request. 
+First of all we need replace the default `RenderController` with our own implementation. This new controller will output content either as rendered HTML (using Umbraco's Razor templating) or as JSON (using I-ology HeadlessUmbraco) depending on the state of the request.
 
 In this implementation we'll return content in a headless manner if the current request has `application/json` in the `Content-Type` header - otherwise we'll apply the current Umbraco (Razor) template.
 
@@ -23,14 +23,14 @@ public class HeadlessHybridRenderController : HeadlessRenderController
 {
   // ...
 
-  protected override IActionResult IndexFor(IPageData pageData, IPublishedContent content)
+  protected override async Task<IActionResult> IndexFor(IPageData pageData, IPublishedContent content, CancellationToken cancellationToken)
   {
     var isHeadlessRequest = "application/json".Equals(Request.ContentType, StringComparison.OrdinalIgnoreCase);
 
     return isHeadlessRequest
-      // Let I-ology HeadlessUmbraco handle the request	
-      ? base.IndexFor(pageData, content)
-      // Let Umbracos rendering handle the request	
+      // Let I-ology HeadlessUmbraco handle the request
+      ? await base.IndexFor(pageData, content, cancellationToken)
+      // Let Umbracos rendering handle the request
       : CurrentTemplate(content);
   }
 }
@@ -45,57 +45,62 @@ In this sample template we'll render a navigation in Razor, and leave the rest o
 ```html
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
-  Layout = null;
-  var root = Model.Root();
+  Layout = null; var
+  root = Model.Root();
 }
 
 <html>
-<head>
-  <script>
-    fetchRoute = () => {
-      fetch(location.pathname, { headers: { "Content-Type": "application/json" } })
-        .then(response => response.json())
-        .then(data => render(data));
-    }
+  <head>
+    <script>
+      fetchRoute = () => {
+        fetch(location.pathname, {
+          headers: { 'Content-Type': 'application/json' }
+        })
+          .then(response => response.json())
+          .then(data => render(data));
+      };
 
-    render = (data) => {
-      document.getElementById("pageContent").innerText = JSON.stringify(data, null, 2);
-    }
+      render = data => {
+        document.getElementById('pageContent').innerText = JSON.stringify(
+          data,
+          null,
+          2
+        );
+      };
 
-    linkRouter = (e) => {
-      const link = e.target;
-      if (link.tagName !== "A" || link.getAttribute("target") === "_blank") {
-        return;
-      }
-      const href = link.getAttribute("href");
-      if (href.startsWith("http")) {
-        return;
-      }
-      if (href !== location.pathname) {
-        history.pushState(null, "", href);
-        fetchRoute();
-      }
-      e.preventDefault();
-    }
+      linkRouter = e => {
+        const link = e.target;
+        if (link.tagName !== 'A' || link.getAttribute('target') === '_blank') {
+          return;
+        }
+        const href = link.getAttribute('href');
+        if (href.startsWith('http')) {
+          return;
+        }
+        if (href !== location.pathname) {
+          history.pushState(null, '', href);
+          fetchRoute();
+        }
+        e.preventDefault();
+      };
 
-    document.onload = fetchRoute();
-    document.addEventListener("click", linkRouter);
-  </script>
-</head>
-<body>
-<nav>
-  <a href="@root.Url()">@root.Name</a>
-  @foreach (var child in root.Children)
-  {
-    <a href="@child.Url()">@child.Name</a>
-  }
-</nav>
-<pre id="pageContent"></pre>
-</body>
+      document.onload = fetchRoute();
+      document.addEventListener('click', linkRouter);
+    </script>
+  </head>
+  <body>
+    <nav>
+      <a href="@root.Url()">@root.Name</a>
+      @foreach (var child in root.Children) {
+      <a href="@child.Url()">@child.Name</a>
+      }
+    </nav>
+    <pre id="pageContent"></pre>
+  </body>
 </html>
 ```
 
-*Note: Don't rely on this JS router in a real life scenario!*
+_Note: Don't rely on this JS router in a real life scenario!_
 
 ## To summarize...
 

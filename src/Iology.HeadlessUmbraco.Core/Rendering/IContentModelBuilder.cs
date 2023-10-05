@@ -1,9 +1,11 @@
-﻿/**
- * Copyright (c) 2022 Vertica
+/**
+ * Copyright (c) 2023 Vertica
  * Copyright (c) 2023 I-ology
  */
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
@@ -15,5 +17,5 @@ public interface IContentModelBuilder : IDiscoverable
 
 	Type ModelType();
 
-	public object BuildContentModel(IPublishedElement content, IContentElementBuilder contentElementBuilder);
+	public Task<object> BuildContentModelAsync(IPublishedElement content, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken);
 }

@@ -1,9 +1,11 @@
-﻿/**
- * Copyright (c) 2022 Vertica
+/**
+ * Copyright (c) 2023 Vertica
  * Copyright (c) 2023 I-ology
  */
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
@@ -15,8 +17,8 @@ public class DateTimePropertyRenderer : IPropertyRenderer
 
 	public Type TypeFor(IPublishedPropertyType propertyType) => typeof(DateTime?);
 
-	public object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder)
-		=> umbracoValue is DateTime dateTime && dateTime.Year > 1
-			? dateTime
-			: (DateTime?) null;
+	public Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
+		=> Task.FromResult<object>(umbracoValue is DateTime dateTime && dateTime.Year > 1
+            ? dateTime
+            : (DateTime?)null);
 }

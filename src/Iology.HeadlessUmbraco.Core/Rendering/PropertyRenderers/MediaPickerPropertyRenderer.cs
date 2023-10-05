@@ -1,18 +1,21 @@
-﻿/**
- * Copyright (c) 2022 Vertica
+/**
+ * Copyright (c) 2023 Vertica
  * Copyright (c) 2023 I-ology
  */
 
+using Iology.HeadlessUmbraco.Core.Extensions;
+using Iology.HeadlessUmbraco.Core.Models;
+using Iology.HeadlessUmbraco.Core.Rendering.Providers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Extensions;
-using Iology.HeadlessUmbraco.Core.Models;
-using Iology.HeadlessUmbraco.Core.Rendering.Providers;
 
 namespace Iology.HeadlessUmbraco.Core.Rendering.PropertyRenderers;
 
@@ -32,19 +35,19 @@ public class MediaPickerPropertyRenderer : IPropertyRenderer
 			? typeof(Media[])
 			: typeof(Media);
 
-	public virtual object ValueFor(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder)
+	public virtual async Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
 	{
-		Media CreateMedia(IPublishedContent media)
-		{
-			var imageCropperValue = media.Value<ImageCropperValue>(Constants.Conventions.Media.File);
-			return MediaPicker3PropertyRenderer.ToMedia(media, imageCropperValue, contentElementBuilder, _urlProvider, UrlMode.Auto);
-		}
+        async Task<Media> CreateMediaAsync(IPublishedContent media)
+        {
+            var imageCropperValue = media.Value<ImageCropperValue>(Constants.Conventions.Media.File);
+            return await MediaPicker3PropertyRenderer.ToMediaAsync(media, imageCropperValue, contentElementBuilder, _urlProvider, UrlMode.Auto, cancellationToken).ConfigureAwait(false);
+        }
 
-		return umbracoValue switch
-		{
-			IPublishedContent item => CreateMedia(item),
-			IEnumerable<IPublishedContent> items => items.Select(CreateMedia).ToArray(),
-			_ => null
-		};
-	}
+        return umbracoValue switch
+        {
+            IPublishedContent item => await CreateMediaAsync(item).ConfigureAwait(false),
+            IEnumerable<IPublishedContent> items => await items.Select(CreateMediaAsync).ToArrayAsync().ConfigureAwait(false),
+            _ => null
+        };
+    }
 }
