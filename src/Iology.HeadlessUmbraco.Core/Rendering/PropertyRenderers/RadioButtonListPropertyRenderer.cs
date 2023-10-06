@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Copyright (c) 2022 Vertica
  * Copyright (c) 2023 I-ology
  */
@@ -9,5 +9,5 @@ namespace Iology.HeadlessUmbraco.Core.Rendering.PropertyRenderers;
 
 public class RadioButtonListPropertyRenderer : GenericPropertyRenderer<string>
 {
-	public override string PropertyEditorAlias => Constants.PropertyEditors.Aliases.RadioButtonList;
+    public override string PropertyEditorAlias => Constants.PropertyEditors.Aliases.RadioButtonList;
 }

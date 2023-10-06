@@ -4,10 +4,6 @@
 
 using Iology.HeadlessUmbraco.Core.Extensions;
 using Iology.HeadlessUmbraco.Core.Models;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -20,7 +16,7 @@ public class BlockGridPropertyRenderer : IPropertyRenderer
 
     public Type TypeFor(IPublishedPropertyType propertyType) => typeof(BlockGrid);
 
-    public virtual async Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
+    public virtual async Task<object?> ValueForAsync(object? umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
     {
         return umbracoValue is BlockGridModel grid ?
             new BlockGrid

@@ -13,6 +13,10 @@
     <!-- <Version></Version> -->
     <Description>Swagger support for Iology.HeadlessUmbraco.Core</Description>
     <PackageProjectUrl>https://github.com/Iologyinc/Iology.HeadlessUmbraco</PackageProjectUrl>
+
+    <RootNamespace>Iology.HeadlessUmbraco.Swagger</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

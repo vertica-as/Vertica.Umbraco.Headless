@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Copyright (c) 2022 Vertica
  * Copyright (c) 2023 I-ology
  */
@@ -9,7 +9,7 @@ namespace Iology.HeadlessUmbraco.Core.Rendering;
 
 public interface IRenderingService
 {
-	IPropertyRenderer PropertyRendererFor(IPublishedPropertyType propertyType);
+    IPropertyRenderer PropertyRendererFor(IPublishedPropertyType propertyType);
 
-	IContentModelBuilder ContentModelBuilderFor(IPublishedContentType contentType);
+    IContentModelBuilder ContentModelBuilderFor(IPublishedContentType contentType);
 }

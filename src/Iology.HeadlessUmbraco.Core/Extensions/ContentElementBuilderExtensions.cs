@@ -5,8 +5,6 @@
 
 using Iology.HeadlessUmbraco.Core.Models;
 using Iology.HeadlessUmbraco.Core.Rendering;
-using System.Threading.Tasks;
-using System.Threading;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Iology.HeadlessUmbraco.Core.Extensions;

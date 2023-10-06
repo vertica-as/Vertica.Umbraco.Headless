@@ -6,11 +6,6 @@
 using Iology.HeadlessUmbraco.Core.Extensions;
 using Iology.HeadlessUmbraco.Core.Models;
 using Iology.HeadlessUmbraco.Core.Rendering.Providers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -21,22 +16,22 @@ namespace Iology.HeadlessUmbraco.Core.Rendering.PropertyRenderers;
 
 public class MediaPickerPropertyRenderer : IPropertyRenderer
 {
-	private readonly IUrlProvider _urlProvider;
+    private readonly IUrlProvider _urlProvider;
 
-	public MediaPickerPropertyRenderer(IUrlProvider urlProvider)
-	{
-		_urlProvider = urlProvider;
-	}
+    public MediaPickerPropertyRenderer(IUrlProvider urlProvider)
+    {
+        _urlProvider = urlProvider;
+    }
 
-	public string PropertyEditorAlias => Constants.PropertyEditors.Aliases.MediaPicker;
+    public string PropertyEditorAlias => Constants.PropertyEditors.Aliases.MediaPicker;
 
-	public Type TypeFor(IPublishedPropertyType propertyType)
-		=> propertyType.DataType.ConfigurationAs<MediaPickerConfiguration>().Multiple
-			? typeof(Media[])
-			: typeof(Media);
+    public Type TypeFor(IPublishedPropertyType propertyType)
+        => propertyType.DataType.ConfigurationAs<MediaPickerConfiguration>()!.Multiple
+            ? typeof(Media[])
+            : typeof(Media);
 
-	public virtual async Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
-	{
+    public virtual async Task<object?> ValueForAsync(object? umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
+    {
         async Task<Media> CreateMediaAsync(IPublishedContent media)
         {
             var imageCropperValue = media.Value<ImageCropperValue>(Constants.Conventions.Media.File);

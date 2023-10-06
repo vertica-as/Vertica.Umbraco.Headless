@@ -1,18 +1,16 @@
-﻿/**
+/**
  * Copyright (c) 2022 Vertica
  * Copyright (c) 2023 I-ology
  */
 
-using System;
-using System.Collections.Generic;
-using Umbraco.Cms.Core.Composing;
 using Iology.HeadlessUmbraco.Core.Rendering;
+using Umbraco.Cms.Core.Composing;
 
 namespace Iology.HeadlessUmbraco.Core.Composing;
 
 public class ContentModelBuilderTypeCollection : BuilderCollectionBase<IContentModelBuilder>
 {
-	public ContentModelBuilderTypeCollection(Func<IEnumerable<IContentModelBuilder>> items) : base(items)
-	{
-	}
+    public ContentModelBuilderTypeCollection(Func<IEnumerable<IContentModelBuilder>> items) : base(items)
+    {
+    }
 }

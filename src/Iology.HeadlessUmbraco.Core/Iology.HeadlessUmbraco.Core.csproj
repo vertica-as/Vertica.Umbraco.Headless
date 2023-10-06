@@ -13,12 +13,16 @@
     <!-- <Version></Version> -->
     <Description>Framework for creating headless experiences with Umbraco CMS</Description>
     <PackageProjectUrl>https://github.com/Iologyinc/Iology.HeadlessUmbraco</PackageProjectUrl>
+
+    <RootNamespace>Iology.HeadlessUmbraco.Core</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Umbraco.Cms.Core" Version="10.5.1" />
-    <PackageReference Include="Umbraco.Cms.Web.Common" Version="10.5.1" />
-    <PackageReference Include="Umbraco.Cms.Web.Website" Version="10.5.1" />
+    <PackageReference Include="Umbraco.Cms.Core" Version="10.3.0" />
+    <PackageReference Include="Umbraco.Cms.Web.Common" Version="10.3.0" />
+    <PackageReference Include="Umbraco.Cms.Web.Website" Version="10.3.0" />
   </ItemGroup>
 
   <ItemGroup>

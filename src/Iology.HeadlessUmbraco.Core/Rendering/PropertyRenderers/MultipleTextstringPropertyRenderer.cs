@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Copyright (c) 2022 Vertica
  * Copyright (c) 2023 I-ology
  */
@@ -9,5 +9,5 @@ namespace Iology.HeadlessUmbraco.Core.Rendering.PropertyRenderers;
 
 public class MultipleTextstringPropertyRenderer : StringArrayPropertyRenderer
 {
-	public override string PropertyEditorAlias => Constants.PropertyEditors.Aliases.MultipleTextstring;
+    public override string PropertyEditorAlias => Constants.PropertyEditors.Aliases.MultipleTextstring;
 }

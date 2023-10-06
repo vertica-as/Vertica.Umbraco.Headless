@@ -4,8 +4,6 @@
  */
 
 using Iology.HeadlessUmbraco.Core.Models;
-using System.Threading;
-using System.Threading.Tasks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Iology.HeadlessUmbraco.Core.Rendering;

@@ -2,8 +2,6 @@
  * Copyright (c) 2023 I-ology
  */
 
-using System;
-
 namespace Iology.HeadlessUmbraco.Core.Models;
 
 public class BlockGridAreaElement

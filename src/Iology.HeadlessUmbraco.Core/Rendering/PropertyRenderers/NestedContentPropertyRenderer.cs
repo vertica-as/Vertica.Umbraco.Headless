@@ -5,11 +5,6 @@
 
 using Iology.HeadlessUmbraco.Core.Extensions;
 using Iology.HeadlessUmbraco.Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -22,13 +17,13 @@ public class NestedContentPropertyRenderer : IPropertyRenderer
 
     public Type TypeFor(IPublishedPropertyType propertyType)
     {
-	    var config = propertyType.DataType.ConfigurationAs<NestedContentConfiguration>();
-	    return config.MinItems == 1 && config.MaxItems == 1
-		    ? typeof(IContentElement)
-		    : typeof(IContentElement[]);
+        var config = propertyType.DataType.ConfigurationAs<NestedContentConfiguration>()!;
+        return config.MinItems == 1 && config.MaxItems == 1
+            ? typeof(IContentElement)
+            : typeof(IContentElement[]);
     }
 
-    public virtual async Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
+    public virtual async Task<object?> ValueForAsync(object? umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
     {
         if (umbracoValue is IEnumerable<IPublishedElement> items)
         {

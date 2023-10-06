@@ -1,9 +1,6 @@
-﻿/**
+/**
  * Copyright (c) 2023 I-ology
  */
-
-using System;
-using System.Collections.Generic;
 
 namespace Iology.HeadlessUmbraco.Core.Models;
 

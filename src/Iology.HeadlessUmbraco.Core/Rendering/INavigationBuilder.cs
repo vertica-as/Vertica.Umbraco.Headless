@@ -4,13 +4,11 @@
  */
 
 using Iology.HeadlessUmbraco.Core.Models;
-using System.Threading;
-using System.Threading.Tasks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Iology.HeadlessUmbraco.Core.Rendering;
 
 public interface INavigationBuilder
 {
-	Task<INavigation> BuildNavigationAsync(IPublishedContent content, CancellationToken cancellationToken);
+    Task<INavigation> BuildNavigationAsync(IPublishedContent content, CancellationToken cancellationToken);
 }

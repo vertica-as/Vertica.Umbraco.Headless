@@ -3,9 +3,6 @@
  * Copyright (c) 2023 I-ology
  */
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
@@ -17,5 +14,5 @@ public interface IPropertyRenderer : IDiscoverable
 
     Type TypeFor(IPublishedPropertyType propertyType);
 
-    Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken);
+    Task<object?> ValueForAsync(object? umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken);
 }

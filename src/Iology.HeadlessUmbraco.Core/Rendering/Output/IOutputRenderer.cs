@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Copyright (c) 2022 Vertica
  * Copyright (c) 2023 I-ology
  */
@@ -9,7 +9,7 @@ namespace Iology.HeadlessUmbraco.Core.Rendering.Output;
 
 public interface IOutputRenderer
 {
-	string Serialize(object value);
+    string Serialize(object value);
 
-	IActionResult ActionResult(object value);
+    IActionResult ActionResult(object value);
 }

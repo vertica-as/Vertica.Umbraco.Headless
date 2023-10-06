@@ -5,11 +5,6 @@
 
 using Iology.HeadlessUmbraco.Core.Extensions;
 using Iology.HeadlessUmbraco.Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -18,11 +13,11 @@ namespace Iology.HeadlessUmbraco.Core.Rendering.PropertyRenderers;
 
 public class BlockListPropertyRenderer : IPropertyRenderer
 {
-	public string PropertyEditorAlias => Constants.PropertyEditors.Aliases.BlockList;
+    public string PropertyEditorAlias => Constants.PropertyEditors.Aliases.BlockList;
 
-	public Type TypeFor(IPublishedPropertyType propertyType) => typeof(ContentElementWithSettings[]);
+    public Type TypeFor(IPublishedPropertyType propertyType) => typeof(ContentElementWithSettings[]);
 
-	public virtual async Task<object> ValueForAsync(object umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
+    public virtual async Task<object?> ValueForAsync(object? umbracoValue, IPublishedProperty property, IContentElementBuilder contentElementBuilder, CancellationToken cancellationToken)
     {
         if (umbracoValue is IEnumerable<BlockListItem> items)
         {

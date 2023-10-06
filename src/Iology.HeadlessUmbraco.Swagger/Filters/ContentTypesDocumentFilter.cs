@@ -3,361 +3,358 @@
  * Copyright (c) 2023 I-ology
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Extensions;
 using Iology.HeadlessUmbraco.Core.Models;
 using Iology.HeadlessUmbraco.Core.Rendering;
 using Iology.HeadlessUmbraco.Swagger.TypeMapping;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Reflection;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Iology.HeadlessUmbraco.Swagger.Filters;
 
 public class ContentTypesDocumentFilter : IDocumentFilter
 {
-	private readonly IContentTypeService _contentTypeService;
-	private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
-	private readonly IRenderingService _renderingService;
-	private readonly Action<ReplaceType> _typeReplacement;
-	private readonly Type[] _additionalTypes;
+    private readonly IContentTypeService _contentTypeService;
+    private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
+    private readonly IRenderingService _renderingService;
+    private readonly Action<ReplaceType> _typeReplacement;
+    private readonly Type[] _additionalTypes;
 
-	public ContentTypesDocumentFilter(
-		IContentTypeService contentTypeService, IPublishedContentTypeFactory publishedContentTypeFactory, IRenderingService renderingService, 
-		Action<ReplaceType> typeReplacement, Type[] additionalTypes)
-	{
-		_contentTypeService = contentTypeService;
-		_publishedContentTypeFactory = publishedContentTypeFactory;
-		_renderingService = renderingService;
-		_typeReplacement = typeReplacement;
-		_additionalTypes = additionalTypes;
-	}
+    public ContentTypesDocumentFilter(
+        IContentTypeService contentTypeService, IPublishedContentTypeFactory publishedContentTypeFactory, IRenderingService renderingService, 
+        Action<ReplaceType> typeReplacement, Type[] additionalTypes)
+    {
+        _contentTypeService = contentTypeService;
+        _publishedContentTypeFactory = publishedContentTypeFactory;
+        _renderingService = renderingService;
+        _typeReplacement = typeReplacement;
+        _additionalTypes = additionalTypes;
+    }
 
-	public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
-	{
-		var replaceType = new ReplaceType();
-		replaceType
-			.Replace<IBreadcrumbItem>().With<BreadcrumbItem>()
-			.Replace<IContentElement>().With<ContentElement>()
-			.Replace<ILanguageAndUrl>().With<LanguageAndUrl>()
-			.Replace<IMetadata>().With<Metadata>()
-			.Replace<INavigation>().With<Navigation>()
-			.Replace<IPageData>().With<PageData>();
+    public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
+    {
+        var replaceType = new ReplaceType();
+        replaceType
+            .Replace<IBreadcrumbItem>().With<BreadcrumbItem>()
+            .Replace<IContentElement>().With<ContentElement>()
+            .Replace<ILanguageAndUrl>().With<LanguageAndUrl>()
+            .Replace<IMetadata>().With<Metadata>()
+            .Replace<INavigation>().With<Navigation>()
+            .Replace<IPageData>().With<PageData>();
 
-		_typeReplacement?.Invoke(replaceType);
+        _typeReplacement?.Invoke(replaceType);
 
-		Type ActualTypeFor(Type type) => replaceType.Mappings.TryGetValue(type, out var actual) ? actual : type;
+        Type ActualTypeFor(Type type) => replaceType.Mappings.TryGetValue(type, out var actual) ? actual : type;
 
-		var queue = new Queue<Type>();
-		Type EnqueueType(Type type)
-		{
-			type = ActualTypeFor(type);
-			if (queue.Contains(type) == false)
-			{
-				queue.Enqueue(type);
-			}
-			return type;
-		}
+        var queue = new Queue<Type>();
+        Type EnqueueType(Type type)
+        {
+            type = ActualTypeFor(type);
+            if (queue.Contains(type) == false)
+            {
+                queue.Enqueue(type);
+            }
+            return type;
+        }
 
-		EnqueueType(typeof(IPageData));
-		EnqueueType(typeof(IContentElement));
-		foreach (var type in _additionalTypes)
-		{
-			EnqueueType(type);
-		}
+        EnqueueType(typeof(IPageData));
+        EnqueueType(typeof(IContentElement));
+        foreach (var type in _additionalTypes)
+        {
+            EnqueueType(type);
+        }
 
-		OpenApiSchema PropertySchemaFor(Type type, Func<bool> defaultNullable)
-			=> BuildPropertySchemaFor(type, defaultNullable, EnqueueType);
+        OpenApiSchema PropertySchemaFor(Type type, Func<bool> defaultNullable)
+            => BuildPropertySchemaFor(type, defaultNullable, EnqueueType);
 
-		var allContentTypesByAlias = _contentTypeService.GetAll().ToDictionary(c => c.Alias);
-		var allPublishedContentTypesByAlias = allContentTypesByAlias.Values.Select(c => _publishedContentTypeFactory.CreateContentType(c)).ToDictionary(pct => pct.Alias);
+        var allContentTypesByAlias = _contentTypeService.GetAll().ToDictionary(c => c.Alias);
+        var allPublishedContentTypesByAlias = allContentTypesByAlias.Values.Select(c => _publishedContentTypeFactory.CreateContentType(c)).ToDictionary(pct => pct.Alias);
 
-		var contentModelBuilderTypes = allPublishedContentTypesByAlias.Values
-			.Select(pc => _renderingService.ContentModelBuilderFor(pc))
-			.Where(c => c != null)
-			.Select(c =>
-			{
-				if (allContentTypesByAlias.TryGetValue(c.ContentTypeAlias(), out var contentType) == false)
-				{
-					return null;
-				}
-				return new
-				{
-					ContentType = contentType,
-					Type = c.ModelType()
-				};
-			})
-			.Where(c => c != null)
-			.ToArray();
-		foreach (var contentModelBuilderType in contentModelBuilderTypes)
-		{
-			EnqueueType(contentModelBuilderType.Type);
-		}
-		
-		var autoGeneratedPublishedContentTypesByAlias = allPublishedContentTypesByAlias
-			.Where(c => contentModelBuilderTypes.Any(t => t.ContentType.Alias == c.Value.Alias) == false)
-			.ToDictionary(k => k.Key, k => k.Value);
-		
-		foreach (var publishedContentType in autoGeneratedPublishedContentTypesByAlias.Values)
-		{
-			var compositions = publishedContentType.CompositionAliases?
-				.Select(alias => allPublishedContentTypesByAlias.TryGetValue(alias, out var pct) ? pct : null)
-				.Where(pct => pct != null)
-				.ToArray() ?? Array.Empty<IPublishedContentType>();
+        var contentModelBuilderTypes = allPublishedContentTypesByAlias.Values
+            .Select(pc => _renderingService.ContentModelBuilderFor(pc))
+            .Where(c => c != null)
+            .Select(c =>
+            {
+                if (allContentTypesByAlias.TryGetValue(c.ContentTypeAlias(), out var contentType) == false)
+                {
+                    return null;
+                }
+                return new
+                {
+                    ContentType = contentType,
+                    Type = c.ModelType()
+                };
+            })
+            .Where(c => c != null)
+            .ToArray();
+        foreach (var contentModelBuilderType in contentModelBuilderTypes)
+        {
+            EnqueueType(contentModelBuilderType.Type);
+        }
+        
+        var autoGeneratedPublishedContentTypesByAlias = allPublishedContentTypesByAlias
+            .Where(c => contentModelBuilderTypes.Any(t => t.ContentType.Alias == c.Value.Alias) == false)
+            .ToDictionary(k => k.Key, k => k.Value);
+        
+        foreach (var publishedContentType in autoGeneratedPublishedContentTypesByAlias.Values)
+        {
+            var compositions = publishedContentType.CompositionAliases?
+                .Select(alias => allPublishedContentTypesByAlias.TryGetValue(alias, out var pct) ? pct : null)
+                .Where(pct => pct != null)
+                .ToArray() ?? Array.Empty<IPublishedContentType>();
 
-			var compositionProperties = compositions.SelectMany(c => c.PropertyTypes.Select(pt => pt.Alias)).Distinct().ToArray();
+            var compositionProperties = compositions.SelectMany(c => c.PropertyTypes.Select(pt => pt.Alias)).Distinct().ToArray();
 
-			var contentType = allContentTypesByAlias[publishedContentType.Alias];
-			var propertyTypesByAlias = contentType.PropertyTypes.ToDictionary(p => p.Alias);
+            var contentType = allContentTypesByAlias[publishedContentType.Alias];
+            var propertyTypesByAlias = contentType.PropertyTypes.ToDictionary(p => p.Alias);
 
-			var properties = publishedContentType.PropertyTypes.Where(pt => compositionProperties.Contains(pt.Alias) == false).ToDictionary(
-				pt => PropertyNameFor(pt.Alias),
-				pt =>
-				{
-					var propertyType = _renderingService.PropertyRendererFor(pt).TypeFor(pt);
-					var isNullable = propertyType.IsValueType == false && propertyTypesByAlias[pt.Alias].Mandatory == false;
-					var propertySchema = PropertySchemaFor(propertyType, () => isNullable);
-					return propertySchema;
-				}
-			);
+            var properties = publishedContentType.PropertyTypes.Where(pt => compositionProperties.Contains(pt.Alias) == false).ToDictionary(
+                pt => PropertyNameFor(pt.Alias),
+                pt =>
+                {
+                    var propertyType = _renderingService.PropertyRendererFor(pt).TypeFor(pt);
+                    var isNullable = propertyType.IsValueType == false && propertyTypesByAlias[pt.Alias].Mandatory == false;
+                    var propertySchema = PropertySchemaFor(propertyType, () => isNullable);
+                    return propertySchema;
+                }
+            );
 
-			var schema = new OpenApiSchema
-			{
-				Type = "object",
-				Description = $"Auto-generated content model for Umbraco content type: {contentType.Name} ({contentType.Alias})"
-			};
+            var schema = new OpenApiSchema
+            {
+                Type = "object",
+                Description = $"Auto-generated content model for Umbraco content type: {contentType.Name} ({contentType.Alias})"
+            };
 
-			if (compositions.Any())
-			{
-				schema.AllOf = compositions.Select(pct => new OpenApiSchema
-				{
-					Reference = new OpenApiReference
-					{
-						Id = TypeNameFor(pct.Alias),
-						Type = ReferenceType.Schema
-					}
-				}).ToList();
-			}
+            if (compositions.Any())
+            {
+                schema.AllOf = compositions.Select(pct => new OpenApiSchema
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Id = TypeNameFor(pct.Alias),
+                        Type = ReferenceType.Schema
+                    }
+                }).ToList();
+            }
 
-			if (schema.AllOf.Any())
-			{
-				schema.AllOf.Add(new OpenApiSchema
-				{
-					Properties = properties,
-					Required = properties.Keys.ToHashSet()
-				});
-			}
-			else
-			{
-				schema.Properties = properties;
-				schema.Required = properties.Keys.ToHashSet();
-			}
+            if (schema.AllOf.Any())
+            {
+                schema.AllOf.Add(new OpenApiSchema
+                {
+                    Properties = properties,
+                    Required = properties.Keys.ToHashSet()
+                });
+            }
+            else
+            {
+                schema.Properties = properties;
+                schema.Required = properties.Keys.ToHashSet();
+            }
 
-			swaggerDoc.Components.Schemas.Add(TypeNameFor(publishedContentType.Alias), schema);
-		}
+            swaggerDoc.Components.Schemas.Add(TypeNameFor(publishedContentType.Alias), schema);
+        }
 
-		var nullabilityInfoContext = new NullabilityInfoContext();
+        var nullabilityInfoContext = new NullabilityInfoContext();
 
-		while (queue.Any())
-		{
-			var type = queue.Dequeue();
+        while (queue.Any())
+        {
+            var type = queue.Dequeue();
 
-			var baseType = type.BaseType != null && type.BaseType.Namespace != "System"
-				? type.BaseType
-				: null;
-			if (baseType != null)
-			{
-				baseType = EnqueueType(baseType);
-			}
+            var baseType = type.BaseType != null && type.BaseType.Namespace != "System"
+                ? type.BaseType
+                : null;
+            if (baseType != null)
+            {
+                baseType = EnqueueType(baseType);
+            }
 
-			if (swaggerDoc.Components.Schemas.ContainsKey(TypeNameFor(type.Name)))
-			{
-				continue;
-			}
+            if (swaggerDoc.Components.Schemas.ContainsKey(TypeNameFor(type.Name)))
+            {
+                continue;
+            }
 
-			var schema = new OpenApiSchema();
-			Dictionary<string, OpenApiSchema> properties = null;
+            var schema = new OpenApiSchema();
+            Dictionary<string, OpenApiSchema>? properties = null;
 
-			if (type.IsEnum)
-			{
-				schema.Enum = new List<IOpenApiAny>(Enum.GetNames(type).Select(enumValue => new OpenApiString(enumValue)));
-				schema.Type = "string";
-			}
-			else
-			{
-				schema.Type = "object";
-				properties = type
-					.GetProperties(BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Instance)
-					.ToDictionary(
-						p => PropertyNameFor(p.Name),
-						p => PropertySchemaFor(p.PropertyType, () =>
-						{
-							if (type == typeof(ContentElementWithSettings) && p.Name == nameof(ContentElementWithSettings.Settings))
-							{
-								return true;
-							}
-							// eventually add more cases for known nullable properties in code models here
+            if (type.IsEnum)
+            {
+                schema.Enum = new List<IOpenApiAny>(Enum.GetNames(type).Select(enumValue => new OpenApiString(enumValue)));
+                schema.Type = "string";
+            }
+            else
+            {
+                schema.Type = "object";
+                properties = type
+                    .GetProperties(BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Instance)
+                    .ToDictionary(
+                        p => PropertyNameFor(p.Name),
+                        p => PropertySchemaFor(p.PropertyType, () =>
+                        {
+                            if (type == typeof(ContentElementWithSettings) && p.Name == nameof(ContentElementWithSettings.Settings))
+                            {
+                                return true;
+                            }
+                            // eventually add more cases for known nullable properties in code models here
 
-							// check for explicit nullability
-							var nullabilityInfo = nullabilityInfoContext.Create(p);
-							if (nullabilityInfo.ReadState == NullabilityState.Nullable)
-							{
-								return true;
-							}
+                            // check for explicit nullability
+                            var nullabilityInfo = nullabilityInfoContext.Create(p);
+                            if (nullabilityInfo.ReadState == NullabilityState.Nullable)
+                            {
+                                return true;
+                            }
 
-							// default is non-nullable for core models and explicitly coded content models
-							return false;
-						})
-					);
+                            // default is non-nullable for core models and explicitly coded content models
+                            return false;
+                        })
+                    );
 
-				var contentModelBuilderType = contentModelBuilderTypes.FirstOrDefault(c => c.Type == type);
-				if (contentModelBuilderType != null)
-				{
-					schema.Description = $"Custom content model for Umbraco content type: {contentModelBuilderType.ContentType.Name} ({contentModelBuilderType.ContentType.Alias})";
-				}
-			}
+                var contentModelBuilderType = contentModelBuilderTypes.FirstOrDefault(c => c.Type == type);
+                if (contentModelBuilderType != null)
+                {
+                    schema.Description = $"Custom content model for Umbraco content type: {contentModelBuilderType.ContentType.Name} ({contentModelBuilderType.ContentType.Alias})";
+                }
+            }
 
-			if (baseType != null)
-			{
-				schema.AllOf = new List<OpenApiSchema>
-				{
-					new OpenApiSchema
-					{
-						Reference = new OpenApiReference
-						{
-							Id = TypeNameFor(baseType.Name),
-							Type = ReferenceType.Schema
-						}
-					}
-				};
-			}
+            if (baseType != null)
+            {
+                schema.AllOf = new List<OpenApiSchema>
+                {
+                    new OpenApiSchema
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Id = TypeNameFor(baseType.Name),
+                            Type = ReferenceType.Schema
+                        }
+                    }
+                };
+            }
 
-			if (properties != null)
-			{
-				if (schema.AllOf.Any())
-				{
-					schema.AllOf.Add(new OpenApiSchema
-					{
-						Properties = properties,
-						Required = properties.Keys.ToHashSet()
-					});
-				}
-				else
-				{
-					schema.Properties = properties;
-					schema.Required = properties.Keys.ToHashSet();
-				}
-			}
+            if (properties != null)
+            {
+                if (schema.AllOf.Any())
+                {
+                    schema.AllOf.Add(new OpenApiSchema
+                    {
+                        Properties = properties,
+                        Required = properties.Keys.ToHashSet()
+                    });
+                }
+                else
+                {
+                    schema.Properties = properties;
+                    schema.Required = properties.Keys.ToHashSet();
+                }
+            }
 
-			swaggerDoc.Components.Schemas.Add(TypeNameFor(type.Name), schema);
-		}
-	}
+            swaggerDoc.Components.Schemas.Add(TypeNameFor(type.Name), schema);
+        }
+    }
 
-	private OpenApiSchema BuildPropertySchemaFor(Type type, Func<bool> defaultNullable, Func<Type, Type> handleUnknownType)
-	{
-		var schema = new OpenApiSchema();
+    private OpenApiSchema BuildPropertySchemaFor(Type type, Func<bool> defaultNullable, Func<Type, Type> handleUnknownType)
+    {
+        var schema = new OpenApiSchema();
 
-		if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-		{
-			type = type.GenericTypeArguments[0];
-			schema.Nullable = true;
-		}
-		else
-		{
-			schema.Nullable = defaultNullable();
-		}
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+        {
+            type = type.GenericTypeArguments[0];
+            schema.Nullable = true;
+        }
+        else
+        {
+            schema.Nullable = defaultNullable();
+        }
 
-		if (type == typeof(string))
-		{
-			schema.Type = "string";
-		}
-		else if (type == typeof(short) || type == typeof(int) || type == typeof(long))
-		{
-			schema.Type = "integer";
-			schema.Format = type == typeof(int) ? "int32" : type == typeof(long) ? "int64" : null;
-		}
-		else if (type == typeof(bool))
-		{
-			schema.Type = "boolean";
-		}
-		else if (type == typeof(object))
-		{
-			schema.Type = "object";
-		}
-		else if (type == typeof(decimal) || type == typeof(double))
-		{
-			schema.Type = "number";
-			schema.Format = "double";
-		}
-		else if (type == typeof(float))
-		{
-			schema.Type = "number";
-			schema.Format = "float";
-		}
-		else if (type == typeof(DateTime))
-		{
-			schema.Type = "string";
-			schema.Format = "date-time";
-		}
-		else if (type.IsGenericType &&
-					(typeof(IDictionary<,>).IsAssignableFrom(type.GetGenericTypeDefinition()) ||
-					typeof(Dictionary<,>).IsAssignableFrom(type.GetGenericTypeDefinition())))
-		{
-			schema.Type = "object";
-		}
-		else
-		{
-			var enumerableType = EnumerableTypeFor(type);
-			if (enumerableType != null)
-			{
-				schema.Type = "array";
-				schema.Items = BuildPropertySchemaFor(enumerableType, () => false, handleUnknownType);
-			}
-			else
-			{
-				type = handleUnknownType(type);
-				// can't combine $ref and nullable - but it works with anyOf and nullable
-				schema.AnyOf = new List<OpenApiSchema>
-				{
-					new OpenApiSchema
-					{
-						Reference = new OpenApiReference
-						{
-							Id = TypeNameFor(type.Name),
-							Type = ReferenceType.Schema
-						}
-					}
-				};
-			}
-		}
+        if (type == typeof(string))
+        {
+            schema.Type = "string";
+        }
+        else if (type == typeof(short) || type == typeof(int) || type == typeof(long))
+        {
+            schema.Type = "integer";
+            schema.Format = type == typeof(int) ? "int32" : type == typeof(long) ? "int64" : null;
+        }
+        else if (type == typeof(bool))
+        {
+            schema.Type = "boolean";
+        }
+        else if (type == typeof(object))
+        {
+            schema.Type = "object";
+        }
+        else if (type == typeof(decimal) || type == typeof(double))
+        {
+            schema.Type = "number";
+            schema.Format = "double";
+        }
+        else if (type == typeof(float))
+        {
+            schema.Type = "number";
+            schema.Format = "float";
+        }
+        else if (type == typeof(DateTime))
+        {
+            schema.Type = "string";
+            schema.Format = "date-time";
+        }
+        else if (type.IsGenericType &&
+                    (typeof(IDictionary<,>).IsAssignableFrom(type.GetGenericTypeDefinition()) ||
+                    typeof(Dictionary<,>).IsAssignableFrom(type.GetGenericTypeDefinition())))
+        {
+            schema.Type = "object";
+        }
+        else
+        {
+            var enumerableType = EnumerableTypeFor(type);
+            if (enumerableType != null)
+            {
+                schema.Type = "array";
+                schema.Items = BuildPropertySchemaFor(enumerableType, () => false, handleUnknownType);
+            }
+            else
+            {
+                type = handleUnknownType(type);
+                // can't combine $ref and nullable - but it works with anyOf and nullable
+                schema.AnyOf = new List<OpenApiSchema>
+                {
+                    new OpenApiSchema
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Id = TypeNameFor(type.Name),
+                            Type = ReferenceType.Schema
+                        }
+                    }
+                };
+            }
+        }
 
-		return schema;
-	}
+        return schema;
+    }
 
     private static string TypeNameFor(string typeName) => $"umbType_{typeName.ToFirstUpperInvariant()}";
 
-	private static string PropertyNameFor(string propertyName) => $"umbProp_{propertyName.ToFirstLowerInvariant()}";
+    private static string PropertyNameFor(string propertyName) => $"umbProp_{propertyName.ToFirstLowerInvariant()}";
 
-	private static Type EnumerableTypeFor(Type type)
-	{
-		var enumerableType = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>)
-			? type
-			: null;
+    private static Type? EnumerableTypeFor(Type type)
+    {
+        var enumerableType = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>)
+            ? type
+            : null;
 
-		if (enumerableType == null)
-		{
-			var enumerableInterface = type.GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>));
-			if (enumerableInterface != null)
-			{
-				enumerableType = enumerableInterface;
-			}
-		}
+        if (enumerableType == null)
+        {
+            var enumerableInterface = type.GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+            if (enumerableInterface != null)
+            {
+                enumerableType = enumerableInterface;
+            }
+        }
 
-		return enumerableType?.GenericTypeArguments[0];
-	}
+        return enumerableType?.GenericTypeArguments[0];
+    }
 }

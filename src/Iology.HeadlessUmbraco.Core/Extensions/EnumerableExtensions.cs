@@ -3,10 +3,6 @@
  * Copyright (c) 2023 I-ology
  */
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace Iology.HeadlessUmbraco.Core.Extensions;
 
 internal static class EnumerableExtensions
