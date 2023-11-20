@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Website.Controllers;
 using Vertica.Umbraco.Headless.Core.Composing;
@@ -14,7 +15,10 @@ namespace Vertica.Umbraco.Headless.Core.Extensions
 	public static class UmbracoBuilderExtensions
 	{
 		public static IUmbracoBuilder AddHeadless(this IUmbracoBuilder builder, Fallback defaultFallback = default)
-			=> builder.AddHeadless<HeadlessRenderController>(defaultFallback);
+		{
+			builder.AddNotificationHandler<UmbracoApplicationStartingNotification, DisableTemplatesNotificationHandler>();
+			return builder.AddHeadless<HeadlessRenderController>(defaultFallback);
+		}
 
 		public static IUmbracoBuilder AddHeadless<TDefaultController>(this IUmbracoBuilder builder, Fallback defaultFallback = default)
 			where TDefaultController : IRenderController
