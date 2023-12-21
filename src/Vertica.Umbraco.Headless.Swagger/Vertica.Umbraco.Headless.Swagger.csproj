@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net6.0;net7.0</TargetFramework>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Authors>Kenn Jacobsen</Authors>
     <Company>Vertica A/S</Company>
@@ -24,7 +24,7 @@
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.2.3" />
-    <PackageReference Include="Umbraco.Cms.Core" Version="[9.0.1,11.0.0)" />
+    <PackageReference Include="Umbraco.Cms.Core" Version="[9.0.1,13.0.0)" />
   </ItemGroup>
 
   <ItemGroup>
