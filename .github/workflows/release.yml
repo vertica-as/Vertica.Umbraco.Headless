@@ -15,7 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       actions: write
-
+      contents: write
+      packages: write
+      
     steps:
     # Extract the desired release version number from the git tag, and set variables
     - name: Set release version
