@@ -53,6 +53,8 @@ jobs:
         release_name: Release ${{ env.releaseversion }}
         draft: false
         prerelease: false
+        allowUpdates: true
+            
     # Add the core package as an asset
     - name: Upload Release Asset Core
       id: upload-release-asset-core
