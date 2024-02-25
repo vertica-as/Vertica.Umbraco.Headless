@@ -12,7 +12,8 @@ namespace Vertica.Umbraco.Headless.Core.Rendering.Output
 		public IActionResult ActionResult(object value) => new ContentResult
 		{
 			Content = Serialize(value),
-			ContentType = "application/json"
+			ContentType = "application/json",
+			StatusCode = 200
 		};
 
 		protected virtual JsonSerializerSettings JsonSerializerSettings()
