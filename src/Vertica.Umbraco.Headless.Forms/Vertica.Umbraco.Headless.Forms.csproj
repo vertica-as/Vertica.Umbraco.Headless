@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <Authors>Lars Nikander Frandsen</Authors>
+        <Company>Vertica A/S</Company>
+        <Product>Vertica Umbraco Headless Framework</Product>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageIcon>Vertica.png</PackageIcon>
+        <Copyright>Vertica A/S</Copyright>
+        <Nullable>enable</Nullable>
+        <!-- Version is set during release build -->
+        <!-- <Version></Version> -->
+        <Description>Umbraco Forms support for Vertica.Umbraco.Headless.Core</Description>
+        <PackageProjectUrl>https://github.com/vertica-as/vertica.umbraco.headless</PackageProjectUrl>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\..\build\Vertica.png">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Umbraco.Cms.Core" Version="[9.0.1,11.0.0)" />
+        <PackageReference Include="Umbraco.Forms.core" Version="[9.0.1,11.0.0)" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Vertica.Umbraco.Headless.Core\Vertica.Umbraco.Headless.Core.csproj" />
+    </ItemGroup>
+
+</Project>
